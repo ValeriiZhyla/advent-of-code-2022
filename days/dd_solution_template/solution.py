@@ -1,19 +1,12 @@
-import functools
-import itertools
-
-from model.ExpeditionBuilder import *
-
-
 class Solution:
-    common_provision_calories: list[str] = []
+    input = []
 
     def __init__(self, input):
-        self.common_provision_calories_list = input
+        self.input = input
 
-    def solve(self) -> int:
-        expedition = ExpeditionBuilder().create_expedition(self.common_provision_calories_list)
-        elf_carrying_most_calories = expedition.find_elf_carrying_most_calories()
-        return elf_carrying_most_calories.all_carried_calories()
+    def solve(self):
+        pass
+
 
 def read_input() -> list[str]:
     input_file_name = 'input.txt'
@@ -32,4 +25,5 @@ if __name__ == '__main__':
     input_lines = read_input()
     print(input_lines)
     solution = Solution(input_lines)
-    print(f"Full solution : {solution.solve()}")
+    print(f"Answer : {solution.solve()}")
+
