@@ -1,7 +1,4 @@
-import functools
-import itertools
-
-from model.ExpeditionBuilder import *
+from model.ExpeditionBuilder import ExpeditionBuilder
 
 
 class Solution:

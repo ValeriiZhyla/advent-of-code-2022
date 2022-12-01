@@ -1,4 +1,4 @@
-from . Elf import *
+from . Elf import Elf
 
 
 class Expedition:

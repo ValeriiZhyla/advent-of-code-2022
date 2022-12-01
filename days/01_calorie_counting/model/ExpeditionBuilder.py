@@ -1,5 +1,5 @@
-from .Expedition import *
-from .Elf import *
+from .Expedition import Expedition
+from .Elf import Elf
 
 
 class ExpeditionBuilder:
