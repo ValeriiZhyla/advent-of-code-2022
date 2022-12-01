@@ -10,10 +10,15 @@ class Solution:
     def __init__(self, input):
         self.common_provision_calories_list = input
 
-    def solve(self) -> int:
+    def solve(self) -> (int, int):
         expedition = ExpeditionBuilder().create_expedition(self.common_provision_calories_list)
-        elf_carrying_most_calories = expedition.find_elf_carrying_most_calories()
-        return elf_carrying_most_calories.all_carried_calories()
+        # first task
+        main_carrier_calories = expedition.calories_of_main_carrier()
+        # second task
+        amount_of_calories_carried_by_top_3_elves = expedition.sum_of_top_tree_carriers()
+
+        return main_carrier_calories, amount_of_calories_carried_by_top_3_elves
+
 
 def read_input() -> list[str]:
     input_file_name = 'input.txt'

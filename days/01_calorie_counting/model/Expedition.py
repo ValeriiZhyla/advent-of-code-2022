@@ -13,3 +13,12 @@ class Expedition:
             if elf.all_carried_calories() > current_elf_with_most_calories.all_carried_calories():
                 current_elf_with_most_calories = elf
         return current_elf_with_most_calories
+
+    def sum_of_top_tree_carriers(self) -> int:
+        calories: list[int] = list(map(lambda elf: elf.all_carried_calories(), self.members))
+        calories.sort()
+        calories.reverse()
+        return sum(calories[0:3])
+
+    def calories_of_main_carrier(self) -> int:
+        return self.find_elf_carrying_most_calories().all_carried_calories()
