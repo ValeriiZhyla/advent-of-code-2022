@@ -1,6 +1,9 @@
 from model.RPS import RPS
-from model.Decrypter import Decrypter
-from model.Game import Game
+from model.SimpleDecrypter import SimpleDecrypter
+from model.TwoStepsDecrypter import TwoStepsDecrypter
+
+from model.FirstGame import FirstGame
+
 
 class Solution:
     encrypted_moves = []
@@ -8,12 +11,15 @@ class Solution:
     def __init__(self, input):
         self.encrypted_moves = input
 
-    def solve(self) -> int:
-        encrypted_rounds: list[(RPS, RPS)] = Decrypter().decrypt_moves(self.encrypted_moves)
-        score_of_second_player = Game(encrypted_rounds).calculate_score_of_second_player()
-        return score_of_second_player
+    def solve(self) -> (int, int):
+        # first task
+        encrypted_rounds_plain: list[(RPS, RPS)] = SimpleDecrypter().decrypt_moves(self.encrypted_moves)
+        score_of_second_player_normal_game = FirstGame(encrypted_rounds_plain).calculate_score_of_second_player()
+        # second task
+        encrypted_rounds_cheating: list[(RPS, RPS)] = TwoStepsDecrypter().decrypt_moves(self.encrypted_moves)
+        score_of_second_player_second_variation = FirstGame(encrypted_rounds_cheating).calculate_score_of_second_player()
 
-
+        return score_of_second_player_normal_game, score_of_second_player_second_variation
 
 
 def read_input() -> list[str]:
@@ -34,4 +40,3 @@ if __name__ == '__main__':
     print(input_lines)
     solution = Solution(input_lines)
     print(f"Answer : {solution.solve()}")
-

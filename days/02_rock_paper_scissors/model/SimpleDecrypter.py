@@ -1,7 +1,7 @@
 from .RPS import RPS
 
 
-class Decrypter:
+class SimpleDecrypter:
     ROCK_CODES = ["X", "A"]
     PAPER_CODES = ["Y", "B"]
     SCISSORS_CODES = ["Z", "C"]
