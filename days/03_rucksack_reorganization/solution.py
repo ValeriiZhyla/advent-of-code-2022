@@ -1,31 +1,19 @@
+from model.priority_calculator import PriorityCalculator
+
+
 class Solution:
     rucksack_contents: list[str] = []
-    ASCII_OFFSET_LOWER = 97
-    ASCII_OFFSET_UPPER = 65
-    GAME_OFFSET_UPPER = 27
-    GAME_OFFSET_LOWER = 1
 
     def __init__(self, input):
         self.rucksack_contents = input
 
-    def solve(self) -> int:
-        total_score = 0
-        for rucksack in self.rucksack_contents:
-            n = len(rucksack)
-            mid = int(n/2)
-            (l, r) = (rucksack[0:mid], rucksack[mid: n])
-            assert (len(l) == len(r))
-            (items_left, items_right) = (set(l), set(r))
-            print(l)
-            print(items_left)
-            intersection = items_left.intersection(items_right)
-            for item in intersection:
-                if item.isupper():
-                    total_score += ord(item) - self.ASCII_OFFSET_UPPER + self.GAME_OFFSET_UPPER
-                if item.islower():
-                    total_score += ord(item) - self.ASCII_OFFSET_LOWER + self.GAME_OFFSET_LOWER
+    def solve(self) -> (int, int):
+        # first task
+        priority_of_common_items_in_each_rucksack_half = PriorityCalculator().calculate_total_priority_of_common_items_in_each_rucksack_half(self.rucksack_contents)
+        # second task
+        priority_of_badges_of_each_group = PriorityCalculator().calculate_total_priority_of_common_items_in_each_group(self.rucksack_contents)
+        return priority_of_common_items_in_each_rucksack_half,priority_of_badges_of_each_group
 
-        return total_score
 
 def read_input() -> list[str]:
     input_file_name = 'input.txt'
@@ -45,4 +33,4 @@ if __name__ == '__main__':
     print(input_lines)
     solution = Solution(input_lines)
     print(f"Answer : {solution.solve()}")
-
+    # 7831
