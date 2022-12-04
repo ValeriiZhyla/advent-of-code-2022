@@ -1,18 +1,17 @@
-from model.priority_calculator import PriorityCalculator
-
-
+from model.pair_translator import PairTranslator
+from model.pair_translator import CleaningPair
+from model.overlap_calculator import OverlapCalculator
 class Solution:
-    rucksack_contents: list[str] = []
+    cleaning_pairs_text: list[str] = []
 
     def __init__(self, input):
-        self.rucksack_contents = input
+        self.cleaning_pairs_text = input
 
     def solve(self) -> (int, int):
+        parsed_pairs: list[CleaningPair] = PairTranslator().transform_input_to_list_of_pairs(self.cleaning_pairs_text)
         # first task
-        priority_of_common_items_in_each_rucksack_half = PriorityCalculator().calculate_total_priority_of_common_items_in_each_rucksack_half(self.rucksack_contents)
-        # second task
-        priority_of_badges_of_each_group = PriorityCalculator().calculate_total_priority_of_common_items_in_each_group(self.rucksack_contents)
-        return priority_of_common_items_in_each_rucksack_half, priority_of_badges_of_each_group
+        pairs_with_full_overlap_amount = OverlapCalculator().find_amount_of_pairs_with_full_overlap(parsed_pairs)
+        return pairs_with_full_overlap_amount
 
 
 def read_input() -> list[str]:
@@ -33,4 +32,5 @@ if __name__ == '__main__':
     print(input_lines)
     solution = Solution(input_lines)
     print(f"Answer : {solution.solve()}")
-    # 7831
+    #483
+
