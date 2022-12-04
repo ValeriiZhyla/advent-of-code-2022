@@ -1,6 +1,8 @@
 from model.pair_translator import PairTranslator
 from model.pair_translator import CleaningPair
 from model.overlap_calculator import OverlapCalculator
+
+
 class Solution:
     cleaning_pairs_text: list[str] = []
 
@@ -11,7 +13,9 @@ class Solution:
         parsed_pairs: list[CleaningPair] = PairTranslator().transform_input_to_list_of_pairs(self.cleaning_pairs_text)
         # first task
         pairs_with_full_overlap_amount = OverlapCalculator().find_amount_of_pairs_with_full_overlap(parsed_pairs)
-        return pairs_with_full_overlap_amount
+        # second task
+        pairs_with_partial_overlap_amount = OverlapCalculator().find_amount_of_pairs_with_partial_overlap(parsed_pairs)
+        return pairs_with_full_overlap_amount, pairs_with_partial_overlap_amount
 
 
 def read_input() -> list[str]:
@@ -32,5 +36,4 @@ if __name__ == '__main__':
     print(input_lines)
     solution = Solution(input_lines)
     print(f"Answer : {solution.solve()}")
-    #483
-
+    # 483, 874
