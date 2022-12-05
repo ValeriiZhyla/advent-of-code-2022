@@ -3,6 +3,9 @@ from model.move_instruction import MoveInstruction
 from model.stack_description_parser import StackDescriptionParser
 from model.move_description_parser import MoveDescriptionParser
 from model.cargo_crane import CargoCrane
+from model.cargo_crane import ImprovedCargoCrane
+
+import copy
 
 
 class Solution:
@@ -15,14 +18,17 @@ class Solution:
     def __init__(self, input):
         self.input = input
 
-    def solve(self):
+    def solve(self) -> (str, str):
         self.process_input()
         parsed_stacks: list[Stack] = StackDescriptionParser().stacks_description_to_stacks(self.stacks_description)
         parsed_moves: list[MoveInstruction] = MoveDescriptionParser().moves_description_to_move_instructions(self.moves_description)
-        cargo_crane = CargoCrane(parsed_stacks)
-        cargo_crane.perform_move_instructions(parsed_moves)
-        return cargo_crane.top_crate_of_each_stack_as_string()
-
+        # task 1
+        cargo_crane = CargoCrane(copy.deepcopy(parsed_stacks))
+        cargo_crane.perform_move_instructions(copy.deepcopy(parsed_moves))
+        # task 2
+        improved_cargo_crane = ImprovedCargoCrane(copy.deepcopy(parsed_stacks))
+        improved_cargo_crane.perform_move_instructions(copy.deepcopy(parsed_moves))
+        return cargo_crane.top_crate_of_each_stack_as_string(), improved_cargo_crane.top_crate_of_each_stack_as_string()
 
     def process_input(self):
         newline_met = False
@@ -54,5 +60,4 @@ if __name__ == '__main__':
     print(input_lines)
     solution = Solution(input_lines)
     print(f"Answer : {solution.solve()}")
-    # QNNTGTPFN
-
+    # QNNTGTPFN, GGNPJBTTR
