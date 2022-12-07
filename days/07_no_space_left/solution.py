@@ -1,11 +1,19 @@
+from model.directory import Directory, RootDirectory
+from model.disk_structure_parser import DiskStructureParser
+from model.file_system_analyzer import FileSystemAnalyzer
+
 class Solution:
-    input = []
+    console_output = []
+    DIRECTORY_TOTAL_SIZE_THRESHOLD = 100000
 
     def __init__(self, input):
-        self.input = input
+        self.console_output = input
 
-    def solve(self):
-        pass
+    def solve(self) -> int:
+        root_directory: Directory = DiskStructureParser().create_file_system_structure_from_console_lines(self.console_output)
+        total_size_of_small_directories = FileSystemAnalyzer().get_total_size_of_directories_with_size_less_or_equal_than(root_directory, self.DIRECTORY_TOTAL_SIZE_THRESHOLD)
+        return total_size_of_small_directories
+
 
 
 def read_input() -> list[str]:
@@ -26,4 +34,5 @@ if __name__ == '__main__':
     print(input_lines)
     solution = Solution(input_lines)
     print(f"Answer : {solution.solve()}")
+    # 1432936
 

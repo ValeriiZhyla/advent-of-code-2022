@@ -20,21 +20,31 @@ class DiskStructureParser:
             line = console_lines[line_idx]
             match line.split():
                 case [self.CMD_PREFIX, self.CHANGE_DIRECTORY_CMD, self.ROOT_DIRECTORY_NAME]:
+                    # cd /
                     current_directory = root_directory
                 case [self.CMD_PREFIX, self.CHANGE_DIRECTORY_CMD, self.PARENT_DIRECTORY_NAME]:
+                    # cd ..
                     current_directory = current_directory.parent
+                case [self.CMD_PREFIX, self.CHANGE_DIRECTORY_CMD, directory_name]:
+                    # cd name
+                    if current_directory.subdirectory_exists(directory_name):
+                        current_directory = current_directory.get_subdirectory_by_name(directory_name)
+                    else:
+                        new_directory = Directory(directory_name, current_directory)
+                        current_directory = new_directory
                 case [self.CMD_PREFIX, self.LIST_DIRECTORY_CMD]:
                     # $ ls -> lines until next $* contain directory structure
                     next_line_idx = line_idx + 1
                     index_of_next_command = self.find_index_of_next_command(next_line_idx, console_lines)
-                    lines_with_directory_structure: list[str] = []
                     if index_of_next_command == self.END_OF_INPUT:
                         lines_with_directory_structure = console_lines[next_line_idx:]
                         self.create_directory_structure(current_directory, lines_with_directory_structure)
                         return root_directory
                     else:
-                        lines_with_directory_structure = console_lines[next_line_idx:index_of_next_command]
+                        lines_with_directory_structure = console_lines[next_line_idx:index_of_next_command-1]
                         self.create_directory_structure(current_directory, lines_with_directory_structure)
+                case [_, _]:
+                    continue
         return root_directory
 
     def find_index_of_next_command(self, start_idx: int, console_lines: list[str]) -> int:
