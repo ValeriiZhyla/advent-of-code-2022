@@ -1,6 +1,7 @@
 from .file import File
 from .directory import Directory, RootDirectory
 
+
 class DiskStructureParser:
     CMD_PREFIX = "$"
     DIR_PREFIX = "dir"
@@ -41,7 +42,7 @@ class DiskStructureParser:
                         self.create_directory_structure(current_directory, lines_with_directory_structure)
                         return root_directory
                     else:
-                        lines_with_directory_structure = console_lines[next_line_idx:index_of_next_command-1]
+                        lines_with_directory_structure = console_lines[next_line_idx:index_of_next_command - 1]
                         self.create_directory_structure(current_directory, lines_with_directory_structure)
                 case [_, _]:
                     continue
@@ -51,7 +52,7 @@ class DiskStructureParser:
         for line_idx in range(start_idx, len(console_lines)):
             line = console_lines[line_idx]
             match line.split():
-                case[self.CMD_PREFIX, _]:
+                case [self.CMD_PREFIX, _]:
                     return line_idx
         return self.END_OF_INPUT
 
@@ -61,7 +62,7 @@ class DiskStructureParser:
         # size filename
         for line in lines_with_directory_structure:
             match line.split():
-                case[self.DIR_PREFIX, directory_name]:
+                case [self.DIR_PREFIX, directory_name]:
                     current_directory.add_directory(Directory(directory_name, current_directory))
                 case [file_size, file_name]:
                     current_directory.add_file(File(file_name, int(file_size)))

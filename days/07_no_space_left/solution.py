@@ -2,6 +2,7 @@ from model.directory import Directory, RootDirectory
 from model.disk_structure_parser import DiskStructureParser
 from model.file_system_analyzer import FileSystemAnalyzer
 
+
 class Solution:
     console_output = []
     DIRECTORY_TOTAL_SIZE_THRESHOLD = 100000
@@ -18,7 +19,6 @@ class Solution:
         # task 2
         size_of_smallest_directory_to_delete = FileSystemAnalyzer().get_size_of_smallest_directory_to_delete_for_update(root_directory, self.TOTAL_SPACE_SIZE, self.REQUIRED_SPACE)
         return total_size_of_small_directories, size_of_smallest_directory_to_delete
-
 
 
 def read_input() -> list[str]:
@@ -40,4 +40,3 @@ if __name__ == '__main__':
     solution = Solution(input_lines)
     print(f"Answer : {solution.solve()}")
     # 1432936
-
