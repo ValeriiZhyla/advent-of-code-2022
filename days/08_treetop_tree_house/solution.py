@@ -6,10 +6,12 @@ class Solution:
     def __init__(self, input: list[list[int]]):
         self.trees = input
 
-    def solve(self) -> int:
-        amount_of_visible_trees = ForestAnalyzer().count_visible_trees_lrtb(self.trees)
-
-        return amount_of_visible_trees
+    def solve(self) -> (int,int):
+        # task 1
+        amount_of_visible_trees = ForestAnalyzer().count_visible_trees(self.trees)
+        # task 2
+        best_scenic_score = ForestAnalyzer().find_best_scenic_score(self.trees)
+        return amount_of_visible_trees, best_scenic_score
 
 
 def read_input() -> list[str]:
@@ -39,4 +41,5 @@ if __name__ == '__main__':
     print(input_lines)
     solution = Solution(input_lines)
     print(f"Answer : {solution.solve()}")
+    # 1794, 199272
 
