@@ -1,12 +1,13 @@
 from model.forest_analyzer import ForestAnalyzer
 
+
 class Solution:
     trees: list[list[int]] = []
 
     def __init__(self, input: list[list[int]]):
         self.trees = input
 
-    def solve(self) -> (int,int):
+    def solve(self) -> (int, int):
         # task 1
         amount_of_visible_trees = ForestAnalyzer().count_visible_trees(self.trees)
         # task 2
@@ -34,7 +35,6 @@ def transform_input(input_lines: list[str]) -> list[list[int]]:
     return trees
 
 
-
 if __name__ == '__main__':
     input_lines = read_input()
     input_lines = transform_input(input_lines)
@@ -42,4 +42,3 @@ if __name__ == '__main__':
     solution = Solution(input_lines)
     print(f"Answer : {solution.solve()}")
     # 1794, 199272
-

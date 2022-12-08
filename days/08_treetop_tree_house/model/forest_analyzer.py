@@ -45,33 +45,27 @@ class ForestAnalyzer:
         target_tree_row, target_tree_col = tree_idx
         target_tree_height = trees[target_tree_row][target_tree_col]
         potential_barriers = trees[target_tree_row][0:target_tree_col]
-        for potential_barrier_tree_height in potential_barriers:
-            if potential_barrier_tree_height >= target_tree_height:
-                return False
-        return True
+        return self.tree_is_visible_behind_barriers(potential_barriers, target_tree_height)
 
     def tree_is_visible_from_rigth(self, tree_idx: (int, int), trees: list[list[int]]) -> bool:
         target_tree_row, target_tree_col = tree_idx
         target_tree_height = trees[target_tree_row][target_tree_col]
         potential_barriers = trees[target_tree_row][(target_tree_col + 1):]
-        for potential_barrier_tree_height in potential_barriers:
-            if potential_barrier_tree_height >= target_tree_height:
-                return False
-        return True
+        return self.tree_is_visible_behind_barriers(potential_barriers, target_tree_height)
 
     def tree_is_visible_from_top(self, tree_idx: (int, int), trees: list[list[int]]) -> bool:
         target_tree_row, target_tree_col = tree_idx
         target_tree_height = trees[target_tree_row][target_tree_col]
         potential_barriers = [row[target_tree_col] for row in trees][0: target_tree_row]
-        for potential_barrier_tree_height in potential_barriers:
-            if potential_barrier_tree_height >= target_tree_height:
-                return False
-        return True
+        return self.tree_is_visible_behind_barriers(potential_barriers, target_tree_height)
 
     def tree_is_visible_from_bottom(self, tree_idx: (int, int), trees: [list[int]]) -> bool:
         target_tree_row, target_tree_col = tree_idx
         target_tree_height = trees[target_tree_row][target_tree_col]
         potential_barriers = [row[target_tree_col] for row in trees][target_tree_row + 1:]
+        return self.tree_is_visible_behind_barriers(potential_barriers, target_tree_height)
+
+    def tree_is_visible_behind_barriers(self, potential_barriers: list[int], target_tree_height:int) -> bool:
         for potential_barrier_tree_height in potential_barriers:
             if potential_barrier_tree_height >= target_tree_height:
                 return False
@@ -90,51 +84,33 @@ class ForestAnalyzer:
         return view_distance_left * view_distance_right * view_distance_top * view_distance_bottom
 
     def count_visible_trees_left(self, tree_idx: (int, int), trees: list[list[int]]) -> int:
-        view_distance = 1
         target_tree_row, target_tree_col = tree_idx
         target_tree_height = trees[target_tree_row][target_tree_col]
         potential_barriers = trees[target_tree_row][0:target_tree_col]
         potential_barriers.reverse()
-        for potential_barrier_idx in range(0, len(potential_barriers)):
-            potential_barrier_tree_height = potential_barriers[potential_barrier_idx]
-            if potential_barrier_tree_height >= target_tree_height:
-                return view_distance
-            elif potential_barrier_idx < len(potential_barriers) - 1:
-                view_distance += 1
-        return view_distance
+        return self.calculate_visibility_from_tree_to_border(potential_barriers, target_tree_height)
 
     def count_visible_trees_right(self, tree_idx: (int, int), trees: list[list[int]]) -> int:
-        view_distance = 1
         target_tree_row, target_tree_col = tree_idx
         target_tree_height = trees[target_tree_row][target_tree_col]
         potential_barriers = trees[target_tree_row][(target_tree_col + 1):]
-        for potential_barrier_idx in range(0, len(potential_barriers)):
-            potential_barrier_tree_height = potential_barriers[potential_barrier_idx]
-            if potential_barrier_tree_height >= target_tree_height:
-                return view_distance
-            elif potential_barrier_idx < len(potential_barriers) - 1:
-                view_distance += 1
-        return view_distance
+        return self.calculate_visibility_from_tree_to_border(potential_barriers, target_tree_height)
 
     def count_visible_trees_top(self, tree_idx: (int, int), trees: list[list[int]]) -> int:
-        view_distance = 1
         target_tree_row, target_tree_col = tree_idx
         target_tree_height = trees[target_tree_row][target_tree_col]
         potential_barriers = [row[target_tree_col] for row in trees][0: target_tree_row]
         potential_barriers.reverse()
-        for potential_barrier_idx in range(0, len(potential_barriers)):
-            potential_barrier_tree_height = potential_barriers[potential_barrier_idx]
-            if potential_barrier_tree_height >= target_tree_height:
-                return view_distance
-            elif potential_barrier_idx < len(potential_barriers) - 1:
-                view_distance += 1
-        return view_distance
+        return self.calculate_visibility_from_tree_to_border(potential_barriers, target_tree_height)
 
     def count_visible_trees_bottom(self, tree_idx: (int, int), trees: list[list[int]]) -> int:
-        view_distance = 1
         target_tree_row, target_tree_col = tree_idx
         target_tree_height = trees[target_tree_row][target_tree_col]
         potential_barriers = [row[target_tree_col] for row in trees][target_tree_row + 1:]
+        return self.calculate_visibility_from_tree_to_border(potential_barriers, target_tree_height)
+
+    def calculate_visibility_from_tree_to_border(self, potential_barriers: list[int], target_tree_height:int) -> int:
+        view_distance = 1
         for potential_barrier_idx in range(0, len(potential_barriers)):
             potential_barrier_tree_height = potential_barriers[potential_barrier_idx]
             if potential_barrier_tree_height >= target_tree_height:
