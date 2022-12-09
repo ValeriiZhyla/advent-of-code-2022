@@ -9,8 +9,6 @@ class RopePhysics:
         knots: list[Knot] = [Knot(self.starting_point) for i in range(0, knots_number)]
         unique_visited_points: {int, int} = set()
         for line in head_moves_lines:
-            x = 0
-            y = 0
             match line.split():
                 case [direction, steps]:
                     for step in range(0, int(steps)):
