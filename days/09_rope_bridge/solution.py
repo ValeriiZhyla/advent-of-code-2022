@@ -11,18 +11,17 @@ class Solution:
         self.rope_head_moves = input
 
     def solve(self) -> (int, int):
-        physics = RopePhysics()
-        physics.create_grid_and_perform_moves(self.rope_head_moves, knots=self.SIMPLE_ROPE_KNOTS)
-        positions_count_tail_visited_once_or_more_simple_rope = physics.count_visited_tail_positions()
-
+        #physics = RopePhysics()
+        #physics.create_grid_and_perform_moves(self.rope_head_moves, knots=self.SIMPLE_ROPE_KNOTS)
+        #positions_count_tail_visited_once_or_more_simple_rope = physics.count_visited_tail_positions()
         physics = RopePhysics()
         physics.create_grid_and_perform_moves(self.rope_head_moves, knots=self.LONG_ROPE_KNOTS)
         positions_count_tail_visited_once_or_more_long_rope = physics.count_visited_tail_positions()
-        return positions_count_tail_visited_once_or_more_simple_rope, positions_count_tail_visited_once_or_more_long_rope
+        return 0, positions_count_tail_visited_once_or_more_long_rope
 
 
 def read_input() -> list[str]:
-    input_file_name = 'full_input.txt'
+    input_file_name = 'input.txt'
     try:
         with open(input_file_name) as file:
             input_lines = file.readlines()

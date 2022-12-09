@@ -1,3 +1,5 @@
+import copy
+
 from .directions import Directions
 
 
@@ -47,8 +49,8 @@ class RopePhysics:
         width = max_width + (-min_width)
         height = max_height + (-min_height)
         # fill both grids
-        self.rope_grid = [[self.EMPTY_CELL_MARK] * width for row in range(0, height)]
-        self.visited_positions_grid = [[self.NOT_VISITED_MARK] * (width + 1) for row in range(0, height)]
+        self.rope_grid = [[self.EMPTY_CELL_MARK] * (width + 1) for row in range(0, height+1)]
+        self.visited_positions_grid = [[self.NOT_VISITED_MARK] * (width + 1) for row in range(0, height+1)]
         # initialize starting point
         self.starting_point = (-min_width, -min_height)
 
@@ -60,8 +62,23 @@ class RopePhysics:
                     total_count += 1
         return total_count
 
-    def show(self, grid: list[list[str]]):
-        for row in reversed(grid):
+    def show_movement(self, knot_positions):
+        rope_grid_copy = copy.deepcopy(self.rope_grid)
+        for knot_idx in range(0, len(knot_positions)):
+            if knot_idx == 0:
+                label = self.ROPE_HEAD_MARK
+            else:
+                label = knot_idx
+            x, y = knot_positions[knot_idx]
+            if rope_grid_copy[y][x] == self.EMPTY_CELL_MARK:
+                rope_grid_copy[y][x] = str(label)
+
+        for row in reversed(rope_grid_copy):
+            print("".join(row))
+        print("==============================")
+
+    def show_visited_by_tail(self):
+        for row in reversed(self.visited_positions_grid):
             print("".join(row))
 
     def perform_moves(self, head_moves_lines: list[str], knots_number: int = 2):
@@ -94,6 +111,7 @@ class RopePhysics:
                                 self.mark_tail_visited_position(current_tail_position)
                             knots[knot_idx] = current_head_position
                             knots[knot_idx + 1] = current_tail_position
+                            self.show_movement(knots)
                     case _:
                         raise Exception(f"Unexpected move format: {move}")
 
@@ -104,57 +122,56 @@ class RopePhysics:
 
         self.visited_positions_grid[y][x] = self.VISITED_MARK
 
-    def calculate_new_position_tail_one_step(self, current_tail_position: (int, int), old_head_position: (int, int), new_head_position: (int, int), direction: str) -> (int, int):
-        if self.distance(current_tail_position, new_head_position) <= 1:
-            return current_tail_position
-        x, y = current_tail_position
+    def calculate_new_position_tail_one_step(self, tail_position: (int, int), old_head_position: (int, int), new_head_position: (int, int), direction: str) -> (int, int):
+        if self.distance(tail_position, new_head_position) <= 1:
+            return tail_position
+        x, y = tail_position
         match direction:
             case (Directions.RIGHT):
-                if self.same_row(current_tail_position, new_head_position):
+                if self.same_row(tail_position, new_head_position):
                     return x + 1, y
-                elif self.head_was_on_right_top_diagonal(current_tail_position, old_head_position):
+                elif self.head_was_on_right_top_diagonal(tail_position, old_head_position):
                     return x + 1, y + 1
-                elif self.head_was_on_left_top_diagonal(current_tail_position, old_head_position):
+                elif self.head_was_on_left_top_diagonal(tail_position, old_head_position):
                     return x, y
-                elif self.head_was_on_right_bottom_diagonal(current_tail_position, old_head_position):
+                elif self.head_was_on_right_bottom_diagonal(tail_position, old_head_position):
                     return x + 1, y - 1
-                elif self.head_was_on_left_bottom_diagonal(current_tail_position, old_head_position):
+                elif self.head_was_on_left_bottom_diagonal(tail_position, old_head_position):
                     return x, y
             case (Directions.LEFT):
-                if self.same_row(current_tail_position, new_head_position):
+                if self.same_row(tail_position, new_head_position):
                     return x - 1, y
-                elif self.head_was_on_right_top_diagonal(current_tail_position, old_head_position):
+                elif self.head_was_on_right_top_diagonal(tail_position, old_head_position):
                     return x, y
-                elif self.head_was_on_left_top_diagonal(current_tail_position, old_head_position):
+                elif self.head_was_on_left_top_diagonal(tail_position, old_head_position):
                     return x - 1, y + 1
-                elif self.head_was_on_right_bottom_diagonal(current_tail_position, old_head_position):
+                elif self.head_was_on_right_bottom_diagonal(tail_position, old_head_position):
                     return x, y
-                elif self.head_was_on_left_bottom_diagonal(current_tail_position, old_head_position):
+                elif self.head_was_on_left_bottom_diagonal(tail_position, old_head_position):
                     return x - 1, y - 1
             case (Directions.UP):
-                if self.same_column(current_tail_position, new_head_position):
+                if self.same_column(tail_position, new_head_position):
                     return x, y + 1
-                elif self.head_was_on_right_top_diagonal(current_tail_position, old_head_position):
+                elif self.head_was_on_right_top_diagonal(tail_position, old_head_position):
                     return x + 1, y + 1
-                elif self.head_was_on_left_top_diagonal(current_tail_position, old_head_position):
+                elif self.head_was_on_left_top_diagonal(tail_position, old_head_position):
                     return x - 1, y + 1
-                elif self.head_was_on_right_bottom_diagonal(current_tail_position, old_head_position):
+                elif self.head_was_on_right_bottom_diagonal(tail_position, old_head_position):
                     return x, y
-                elif self.head_was_on_left_bottom_diagonal(current_tail_position, old_head_position):
+                elif self.head_was_on_left_bottom_diagonal(tail_position, old_head_position):
                     return x, y
             case (Directions.DOWN):
-                if self.same_column(current_tail_position, new_head_position):
+                if self.same_column(tail_position, new_head_position):
                     return x, y - 1
-                elif self.head_was_on_right_top_diagonal(current_tail_position, old_head_position):
+                elif self.head_was_on_right_top_diagonal(tail_position, old_head_position):
                     return x, y
-                elif self.head_was_on_left_top_diagonal(current_tail_position, old_head_position):
+                elif self.head_was_on_left_top_diagonal(tail_position, old_head_position):
                     return x, y
-                elif self.head_was_on_right_bottom_diagonal(current_tail_position, old_head_position):
+                elif self.head_was_on_right_bottom_diagonal(tail_position, old_head_position):
                     return x + 1, y - 1
-                elif self.head_was_on_left_bottom_diagonal(current_tail_position, old_head_position):
+                elif self.head_was_on_left_bottom_diagonal(tail_position, old_head_position):
                     return x - 1, y - 1
-            case _:
-                raise Exception("Unexpected move")
+        raise Exception(f"Unexpected move: current_tail_position={tail_position},old_head_position={old_head_position}, new_head_position={new_head_position}, direction={direction}")
 
     def distance(self, tail_position: (int, int), head_position: (int, int)) -> int:
         tail_x, tail_y = tail_position
