@@ -4,20 +4,18 @@ from model.rope_physics import RopePhysics
 class Solution:
     rope_head_moves: list[str] = []
 
-    SIMPLE_ROPE_KNOTS = 2
+    SHORT_ROPE_KNOTS = 2
     LONG_ROPE_KNOTS = 10
 
     def __init__(self, input):
         self.rope_head_moves = input
 
     def solve(self) -> (int, int):
-        #physics = RopePhysics()
-        #physics.create_grid_and_perform_moves(self.rope_head_moves, knots=self.SIMPLE_ROPE_KNOTS)
-        #positions_count_tail_visited_once_or_more_simple_rope = physics.count_visited_tail_positions()
-        physics = RopePhysics()
-        physics.create_grid_and_perform_moves(self.rope_head_moves, knots=self.LONG_ROPE_KNOTS)
-        positions_count_tail_visited_once_or_more_long_rope = physics.count_visited_tail_positions()
-        return 0, positions_count_tail_visited_once_or_more_long_rope
+        # Task 1
+        positions_count_tail_visited_once_or_more_simple_rope = RopePhysics().find_unique_points_visited_by_tail(self.rope_head_moves, knots_number=self.SHORT_ROPE_KNOTS)
+        # Task 2
+        positions_count_tail_visited_once_or_more_long_rope = RopePhysics().find_unique_points_visited_by_tail(self.rope_head_moves, knots_number=self.LONG_ROPE_KNOTS)
+        return positions_count_tail_visited_once_or_more_simple_rope, positions_count_tail_visited_once_or_more_long_rope
 
 
 def read_input() -> list[str]:
