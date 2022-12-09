@@ -3,13 +3,20 @@ from model.rope_physics import RopePhysics
 class Solution:
     rope_head_moves: list[str] = []
 
+    SIMPLE_ROPE_KNOTS = 2
+    LONG_ROPE_KNOTS = 10
+
     def __init__(self, input):
         self.rope_head_moves = input
 
     def solve(self):
         physics = RopePhysics()
-        physics.calculate_tail_movements_for_head_moves(self.rope_head_moves)
-        return 0
+        physics.create_grid_and_perform_moves(self.rope_head_moves, knots=self.SIMPLE_ROPE_KNOTS)
+        positions_count_tail_visited_once_or_more = physics.count_visited_tail_positions()
+
+        physics.create_grid_and_perform_moves(self.rope_head_moves, knots=self.LONG_ROPE_KNOTS)
+        positions_count_tail_visited_once_or_more = physics.count_visited_tail_positions()
+        return positions_count_tail_visited_once_or_more
 
 def read_input() -> list[str]:
     input_file_name = 'full_input.txt'
@@ -29,4 +36,5 @@ if __name__ == '__main__':
     print(input_lines)
     solution = Solution(input_lines)
     print(f"Answer : {solution.solve()}")
+    # 6503,
 

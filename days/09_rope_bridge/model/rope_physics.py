@@ -4,8 +4,8 @@ from .directions import Directions
 class RopePhysics:
     starting_point = (0, 0)
 
-    VISITED_MARK = 1
-    NOT_VISITED_MARK = 0
+    VISITED_MARK = "#"
+    NOT_VISITED_MARK = "."
 
     EMPTY_CELL_MARK = "."
     ROPE_HEAD_MARK = "H"
@@ -18,10 +18,9 @@ class RopePhysics:
         self.rope_grid = []
         self.visited_positions_grid = []
 
-    def calculate_tail_movements_for_head_moves(self, head_moves_lines: list[str]):
+    def create_grid_and_perform_moves(self, head_moves_lines: list[str], knots: int = 2):
         self.initialize_grids(head_moves_lines)
-        self.perform_moves(head_moves_lines)
-        self.show(self.rope_grid)
+        self.perform_moves(head_moves_lines, knots)
 
     def initialize_grids(self, head_moves_lines: list[str]):
         max_height = 0
@@ -49,15 +48,24 @@ class RopePhysics:
         height = max_height + (-min_height)
         # fill both grids
         self.rope_grid = [[self.EMPTY_CELL_MARK] * width for row in range(0, height)]
-        self.visited_positions_grid = [[self.NOT_VISITED_MARK] * width for row in range(0, height)]
+        self.visited_positions_grid = [[self.NOT_VISITED_MARK] * (width + 1) for row in range(0, height)]
         # initialize starting point
         self.starting_point = (-min_width, -min_height)
+
+    def count_visited_tail_positions(self):
+        total_count = 0
+        for line in self.visited_positions_grid:
+            for mark in line:
+                if mark == self.VISITED_MARK:
+                    total_count += 1
+        return total_count
 
     def show(self, grid: list[list[str]]):
         for row in reversed(grid):
             print("".join(row))
 
-    def perform_moves(self, head_moves_lines: list[str]):
+    def perform_moves(self, head_moves_lines: list[str], knots: int = 2):
+        assert knots >= 2
         current_head_position = self.starting_point
         current_tail_position = self.starting_point
         self.mark_tail_visited_position(current_tail_position)
@@ -84,6 +92,9 @@ class RopePhysics:
 
     def mark_tail_visited_position(self, current_tail_position: (int, int)):
         x, y = current_tail_position
+        assert y < len(self.visited_positions_grid)
+        assert x < len(self.visited_positions_grid[0])
+
         self.visited_positions_grid[y][x] = self.VISITED_MARK
 
     def calculate_new_position_tail_one_step(self, current_tail_position: (int, int), old_head_position: (int, int), new_head_position: (int, int), direction: str) -> (int, int):
@@ -138,7 +149,7 @@ class RopePhysics:
             case _:
                 raise Exception("Unexpected move")
 
-    def distance(self, tail_position: (int, int), head_position: (int, int)) -> int :
+    def distance(self, tail_position: (int, int), head_position: (int, int)) -> int:
         tail_x, tail_y = tail_position
         head_x, head_y = head_position
         delta_x = abs(head_x - tail_x)
