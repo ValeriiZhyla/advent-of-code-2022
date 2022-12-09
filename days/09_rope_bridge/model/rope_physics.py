@@ -87,13 +87,13 @@ class RopePhysics:
 
         self.mark_tail_visited_position(self.starting_point)
         for move in head_moves_lines:
-            for knot_idx in range(0, knots_number-1):
-                current_head_position = knots[knot_idx]
-                current_tail_position = knots[knot_idx+1]
-                match move.split():
-                    case (direction, steps):
-                        steps = int(steps)
-                        for i in range(0, steps):
+            match move.split():
+                case (direction, steps):
+                    steps = int(steps)
+                    for i in range(0, steps):
+                        for knot_idx in range(0, knots_number - 1):
+                            current_head_position = knots[knot_idx]
+                            current_tail_position = knots[knot_idx + 1]
                             old_head_position = current_head_position
                             head_x, head_y = current_head_position
                             match direction:
@@ -105,15 +105,15 @@ class RopePhysics:
                                     current_head_position = (head_x, head_y + 1)
                                 case (Directions.DOWN):
                                     current_head_position = (head_x, head_y - 1)
-                            current_tail_position = self.calculate_new_position_tail_one_step(current_tail_position, old_head_position, current_head_position, direction)
+                            current_tail_position = self.calculate_new_direction_for_tail_move_tail_one_step(current_tail_position, old_head_position, current_head_position, direction)
                             # track only last knot
                             if knot_idx == knots_number - 2:
                                 self.mark_tail_visited_position(current_tail_position)
                             knots[knot_idx] = current_head_position
                             knots[knot_idx + 1] = current_tail_position
                             self.show_movement(knots)
-                    case _:
-                        raise Exception(f"Unexpected move format: {move}")
+                case _:
+                    raise Exception(f"Unexpected move format: {move}")
 
     def mark_tail_visited_position(self, current_tail_position: (int, int)):
         x, y = current_tail_position
@@ -122,7 +122,7 @@ class RopePhysics:
 
         self.visited_positions_grid[y][x] = self.VISITED_MARK
 
-    def calculate_new_position_tail_one_step(self, tail_position: (int, int), old_head_position: (int, int), new_head_position: (int, int), direction: str) -> (int, int):
+    def calculate_new_direction_for_tail_move_tail_one_step(self, tail_position: (int, int), old_head_position: (int, int), new_head_position: (int, int), direction: str) -> (int, int):
         if self.distance(tail_position, new_head_position) <= 1:
             return tail_position
         x, y = tail_position
@@ -194,12 +194,12 @@ class RopePhysics:
     def head_was_on_left_top_diagonal(self, tail_position, head_position):
         head_x, head_y = head_position
         tail_x, tail_y = tail_position
-        return head_x == tail_x - 1 and head_y == tail_y + 1
+        return head_x <= tail_x - 1 and head_y >= tail_y + 1
 
     def head_was_on_right_bottom_diagonal(self, tail_position, head_position):
         head_x, head_y = head_position
         tail_x, tail_y = tail_position
-        return head_x == tail_x + 1 and head_y == tail_y - 1
+        return head_x >= tail_x + 1 and head_y >= tail_y - 1
 
     def head_was_on_left_bottom_diagonal(self, tail_position, head_position):
         head_x, head_y = head_position
