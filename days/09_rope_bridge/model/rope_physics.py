@@ -64,31 +64,38 @@ class RopePhysics:
         for row in reversed(grid):
             print("".join(row))
 
-    def perform_moves(self, head_moves_lines: list[str], knots: int = 2):
-        assert knots >= 2
-        current_head_position = self.starting_point
-        current_tail_position = self.starting_point
-        self.mark_tail_visited_position(current_tail_position)
+    def perform_moves(self, head_moves_lines: list[str], knots_number: int = 2):
+        assert knots_number >= 2
+        knots: list[(int, int)] = [self.starting_point for i in range(0, knots_number)]
+
+        self.mark_tail_visited_position(self.starting_point)
         for move in head_moves_lines:
-            match move.split():
-                case (direction, steps):
-                    steps = int(steps)
-                    for i in range(0, steps):
-                        old_head_position = current_head_position
-                        head_x, head_y = current_head_position
-                        match direction:
-                            case (Directions.RIGHT):
-                                current_head_position = (head_x + 1, head_y)
-                            case (Directions.LEFT):
-                                current_head_position = (head_x - 1, head_y)
-                            case (Directions.UP):
-                                current_head_position = (head_x, head_y + 1)
-                            case (Directions.DOWN):
-                                current_head_position = (head_x, head_y - 1)
-                        current_tail_position = self.calculate_new_position_tail_one_step(current_tail_position, old_head_position, current_head_position, direction)
-                        self.mark_tail_visited_position(current_tail_position)
-                case _:
-                    raise Exception(f"Unexpected move format: {move}")
+            for knot_idx in range(0, knots_number-1):
+                current_head_position = knots[knot_idx]
+                current_tail_position = knots[knot_idx+1]
+                match move.split():
+                    case (direction, steps):
+                        steps = int(steps)
+                        for i in range(0, steps):
+                            old_head_position = current_head_position
+                            head_x, head_y = current_head_position
+                            match direction:
+                                case (Directions.RIGHT):
+                                    current_head_position = (head_x + 1, head_y)
+                                case (Directions.LEFT):
+                                    current_head_position = (head_x - 1, head_y)
+                                case (Directions.UP):
+                                    current_head_position = (head_x, head_y + 1)
+                                case (Directions.DOWN):
+                                    current_head_position = (head_x, head_y - 1)
+                            current_tail_position = self.calculate_new_position_tail_one_step(current_tail_position, old_head_position, current_head_position, direction)
+                            # track only last knot
+                            if knot_idx == knots_number - 2:
+                                self.mark_tail_visited_position(current_tail_position)
+                            knots[knot_idx] = current_head_position
+                            knots[knot_idx + 1] = current_tail_position
+                    case _:
+                        raise Exception(f"Unexpected move format: {move}")
 
     def mark_tail_visited_position(self, current_tail_position: (int, int)):
         x, y = current_tail_position
