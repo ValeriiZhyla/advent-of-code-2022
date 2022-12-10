@@ -23,6 +23,7 @@ class Instruction:
 
 class NoopInstruction(Instruction):
     NOOP_TICKS = 1
+    NOOP_INSTRUCTION_NAME = "noop"
 
     def __init__(self, register: Register):
         super().__init__(self.NOOP_TICKS, register)
@@ -34,6 +35,8 @@ class NoopInstruction(Instruction):
 class AddxInstruction(Instruction):
     ADDX_TICKS = 2
     value_to_add: int = 0
+    ADDX_INSTRUCTION_NAME = "addx"
+
 
     def __init__(self, register: Register, value: int):
         self.value_to_add = value

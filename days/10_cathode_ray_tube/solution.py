@@ -1,4 +1,5 @@
 from model.register import Register
+from model.cpu import CPU
 
 class Solution:
     instructions = []
@@ -9,7 +10,9 @@ class Solution:
 
     def solve(self):
         register = Register(self.REGISTER_STARTING_VALUE)
-        pass
+        cpu = CPU(register)
+        cpu.process_instructions(self.instructions)
+        return cpu.sum_signal_strengths([20, 60, 100, 140, 180, 220])
 
 
 def read_input() -> list[str]:

@@ -5,19 +5,22 @@ from .register import Register
 class ExecutionStack:
     register: Register = None
     instructions: list[Instruction] = []
-    current_cycle_id: int = 1
 
     def __init__(self, register: Register):
         self.register = register
         self.instructions = []
-        self.current_cycle_id = 1
 
     def process_cycle(self):
-        # remove finished instructions
-        for instruction_idx in range(0, len(self.instructions)):
-            instruction = self.instructions[instruction_idx]
-            if instruction.executed:
-                self.instructions.pop(instruction_idx)
+        self.remove_finished_instructions_from_stack()
         # tick
         for instruction in self.instructions:
             instruction.tick()
+
+    def add_instruction(self, instruction: Instruction):
+        self.instructions.append(instruction)
+
+    def is_empty(self) -> bool:
+        return self.instructions == []
+
+    def remove_finished_instructions_from_stack(self):
+        self.instructions = list(filter(lambda i: not i.executed, self.instructions))
