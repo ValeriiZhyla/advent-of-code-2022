@@ -1,6 +1,7 @@
 from model.register import Register
 from model.cpu import CPU
-
+from model.execution_log import ExecutionLog
+from model.display import Display
 class Solution:
     instructions = []
     REGISTER_STARTING_VALUE = 1
@@ -12,6 +13,9 @@ class Solution:
         register = Register(self.REGISTER_STARTING_VALUE)
         cpu = CPU(register)
         cpu.process_instructions_sequentially(self.instructions)
+
+        register_values: ExecutionLog = cpu.execution_log
+        display = Display().render(register_values)
         return cpu.sum_signal_strengths([20, 60, 100, 140, 180, 220])
 
 

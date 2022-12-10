@@ -10,18 +10,11 @@ class ExecutionStack:
         self.register = register
         self.instructions = []
 
-
     def process_cycle_sequential(self):
         self.remove_finished_instructions_from_stack()
         # tick
         if len(self.instructions) > 0:
             self.instructions[0].tick()
-
-    def process_cycle_pipelining(self):
-        self.remove_finished_instructions_from_stack()
-        # tick
-        for instruction in self.instructions:
-            instruction.tick()
 
     def add_instruction(self, instruction: Instruction):
         self.instructions.append(instruction)
