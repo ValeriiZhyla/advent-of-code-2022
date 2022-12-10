@@ -16,7 +16,7 @@ class Display:
                 current_row_symbol_index = (cycle - 1) % self.ROW_WIDTH
                 register_value = item.register_value
                 sprite_position = list(range(register_value - 1, register_value + 2))
-                if (self.current_rendering_symbol_overlaps_with_sprite(current_row_symbol_index, sprite_position)):
+                if self.current_rendering_symbol_overlaps_with_sprite(current_row_symbol_index, sprite_position):
                     line += self.LIT_PIXEL
                 else:
                     line += self.DARK_PIXEL

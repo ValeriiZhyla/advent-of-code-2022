@@ -37,4 +37,5 @@ if __name__ == '__main__':
     print(input_lines)
     solution = Solution(input_lines)
     print(f"Answer : {solution.solve()}")
+    # 14420, RGLRBZAU
 
