@@ -10,7 +10,14 @@ class ExecutionStack:
         self.register = register
         self.instructions = []
 
-    def process_cycle(self):
+
+    def process_cycle_sequential(self):
+        self.remove_finished_instructions_from_stack()
+        # tick
+        if len(self.instructions) > 0:
+            self.instructions[0].tick()
+
+    def process_cycle_pipelining(self):
         self.remove_finished_instructions_from_stack()
         # tick
         for instruction in self.instructions:
@@ -19,8 +26,8 @@ class ExecutionStack:
     def add_instruction(self, instruction: Instruction):
         self.instructions.append(instruction)
 
-    def is_empty(self) -> bool:
-        return self.instructions == []
+    def has_no_pending_tasks(self) -> bool:
+        return len(list(filter(lambda i: not i.executed, self.instructions))) == 0
 
     def remove_finished_instructions_from_stack(self):
         self.instructions = list(filter(lambda i: not i.executed, self.instructions))

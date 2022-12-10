@@ -11,7 +11,7 @@ class Solution:
     def solve(self):
         register = Register(self.REGISTER_STARTING_VALUE)
         cpu = CPU(register)
-        cpu.process_instructions(self.instructions)
+        cpu.process_instructions_sequentially(self.instructions)
         return cpu.sum_signal_strengths([20, 60, 100, 140, 180, 220])
 
 

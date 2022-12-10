@@ -19,7 +19,18 @@ class CPU:
         self.execution_log = ExecutionLog()
         self.current_cycle_id = self.START_CYCLE_ID
 
-    def process_instructions(self, cpu_instructions: list[str]):
+    def process_instructions_sequentially(self, cpu_instructions: list[str]):
+        for instruction in cpu_instructions:
+            match instruction.split():
+                case [NoopInstruction.NOOP_INSTRUCTION_NAME]:
+                    self.execution_stack.add_instruction(NoopInstruction(self.register))
+                case [AddxInstruction.ADDX_INSTRUCTION_NAME, value]:
+                    parsed_value = int(value)
+                    self.execution_stack.add_instruction(AddxInstruction(self.register, parsed_value))
+            self.process_all_instructions_in_stack()
+
+
+    def process_instructions_with_pipelining(self, cpu_instructions: list[str]):
         for instruction in cpu_instructions:
             match instruction.split():
                 case (NoopInstruction.NOOP_INSTRUCTION_NAME):
@@ -28,19 +39,21 @@ class CPU:
                     parsed_value = int(value)
                     self.execution_stack.add_instruction(AddxInstruction(self.register, parsed_value))
             self.perform_cpu_cycle()
-        while not self.execution_stack.is_empty():
-            self.perform_cpu_cycle()
+        self.process_all_instructions_in_stack()
 
     def perform_cpu_cycle(self):
-        self.execution_stack.process_cycle()
-        self.execution_log.create_entry(self.current_cycle_id, self.register.value)
+        self.execution_stack.process_cycle_sequential()
         self.current_cycle_id += 1
+        self.execution_log.create_entry(self.current_cycle_id, self.register.value)
 
     def sum_signal_strengths(self, list_of_cycle_ids: list[int]) -> int:
-        assert list_of_cycle_ids[-1] >= self.current_cycle_id
+        #assert list_of_cycle_ids[-1] <= self.current_cycle_id
         target_log_entries: list[ExecutionLogEntry] = list(filter(lambda entry: entry.cycle_id in list_of_cycle_ids, self.execution_log.entries))
         return sum(map(lambda entry: entry.cycle_id * entry.register_value, target_log_entries))
 
+    def process_all_instructions_in_stack(self):
+        while not self.execution_stack.has_no_pending_tasks():
+            self.perform_cpu_cycle()
 
 
 

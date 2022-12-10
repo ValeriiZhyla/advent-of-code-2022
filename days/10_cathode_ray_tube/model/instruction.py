@@ -9,16 +9,18 @@ class Instruction:
     def __init__(self, ticks_until_execution: int, register: Register):
         self.ticks_until_execution = ticks_until_execution
         self.register = register
+        self.executed = False
 
     def action(self):
         pass
 
     def tick(self):
+        if self.ticks_until_execution >= 1:
+            self.ticks_until_execution -= 1
         if self.executed == False and self.ticks_until_execution == 0:
             self.action()
             self.executed = True
-        else:
-            self.ticks_until_execution -= 1
+
 
 
 class NoopInstruction(Instruction):
