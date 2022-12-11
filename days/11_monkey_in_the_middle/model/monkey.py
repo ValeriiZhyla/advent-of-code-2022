@@ -1,7 +1,5 @@
 from typing import Callable
 
-WORRY_LEVEL_DIVISOR_AFTER_OPERATION = 3
-
 class Monkey:
     id: int = 0
     count_of_items_inspected: int = 0
@@ -22,11 +20,14 @@ class Monkey:
         self.if_test_true_throw_to_monkey_with_id = if_test_true_throw_to_monkey_with_id
         self.if_test_false_throw_to_monkey_with_id = if_test_false_throw_to_monkey_with_id
 
-    def inspect_items_and_throw_to_other_monkeys(self, monkeys: list['Monkey']):
+    def inspect_items_and_throw_to_other_monkeys(self, monkeys: list['Monkey'], worry_level_divisor_rules: int):
         while self.items != []:
             item = self.items.pop(0)
             worry_level = self.operation_fun(item)
-            worry_level_bored = int(worry_level / WORRY_LEVEL_DIVISOR_AFTER_OPERATION)
+            if worry_level_divisor_rules > 1:
+                worry_level_bored = int(worry_level / worry_level_divisor_rules)
+            else:
+                worry_level_bored = worry_level
             if self.test_fun(worry_level_bored):
                 self.throw_to_monkey(worry_level_bored, self.if_test_true_throw_to_monkey_with_id, monkeys)
             else:

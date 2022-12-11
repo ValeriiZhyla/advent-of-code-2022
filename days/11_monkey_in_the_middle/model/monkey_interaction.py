@@ -1,8 +1,13 @@
 from .monkey import Monkey
 
 
+
+
 class MonkeyInteraction:
     monkeys: list[Monkey] = []
+
+    WORRY_LEVEL_DIVISOR_AFTER_OPERATION_SHORT = 3
+    WORRY_LEVEL_DIVISOR_AFTER_OPERATION_LONG = 1
 
     def __init__(self, monkeys: list[Monkey]):
         self.monkeys = monkeys
@@ -20,10 +25,21 @@ class MonkeyInteraction:
 
     def perform_one_round(self):
         for monkey in self.monkeys:
-            monkey.inspect_items_and_throw_to_other_monkeys(self.monkeys)
+            monkey.inspect_items_and_throw_to_other_monkeys(self.monkeys, self.WORRY_LEVEL_DIVISOR_AFTER_OPERATION_SHORT)
 
     def print_round_results(self, round_id):
         print(f"After round {round_id + 1}, the monkeys are holding items with these worry levels:")
         for monkey in self.monkeys:
             print(f"Monkey {monkey.id}: {str(monkey.items)}")
+        print()
+
+class MonkeyInteractionLong(MonkeyInteraction):
+    def perform_one_round(self):
+        for monkey in self.monkeys:
+            monkey.inspect_items_and_throw_to_other_monkeys(self.monkeys, self.WORRY_LEVEL_DIVISOR_AFTER_OPERATION_LONG)
+
+    def print_round_results(self, round_id):
+        print(f"== After round {round_id + 1} ==")
+        for monkey in self.monkeys:
+            print(f"Monkey {monkey.id} inspected items {str(monkey.count_of_items_inspected)}")
         print()
