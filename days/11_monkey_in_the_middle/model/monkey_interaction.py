@@ -1,8 +1,6 @@
 from .monkey import Monkey
 
 
-
-
 class MonkeyInteraction:
     monkeys: list[Monkey] = []
 
@@ -32,6 +30,7 @@ class MonkeyInteraction:
         for monkey in self.monkeys:
             print(f"Monkey {monkey.id}: {str(monkey.items)}")
         print()
+
 
 class MonkeyInteractionLong(MonkeyInteraction):
     def perform_one_round(self):
