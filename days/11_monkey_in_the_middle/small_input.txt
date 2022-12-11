@@ -1,0 +1,32 @@
+Monkey 0:
+  Starting items: 79, 98
+  Operation: new = old * 19
+  Test: divisible by 23
+    If true: throw to monkey 2
+    If false: throw to monkey 3
+
+Monkey 1:
+  Starting items: 54, 65, 75, 74
+  Operation: new = old + 6
+  Test: divisible by 19
+    If true: throw to monkey 2
+    If false: throw to monkey 0
+
+Monkey 2:
+  Starting items: 79, 60, 97
+  Operation: new = old * old
+  Test: divisible by 13
+    If true: throw to monkey 1
+    If false: throw to monkey 3
+
+Monkey 3:
+  Starting items: 74
+  Operation: new = old + 3
+  Test: divisible by 17
+    If true: throw to monkey 0
+    If false: throw to monkey 1
+
+        Monkey(0, [79, 98], lambda worry: worry * 19, lambda worry: worry % 23 == 0, 2, 3),
+        Monkey(1, [54, 65, 75, 74], lambda worry: worry + 6, lambda worry: worry % 19 == 0, 2, 0),
+        Monkey(2, [79, 60, 97], lambda worry: worry * worry, lambda worry: worry % 13 == 0, 1, 3),
+        Monkey(3, [74], lambda worry: worry + 3, lambda worry: worry % 17 == 0, 0, 1),
