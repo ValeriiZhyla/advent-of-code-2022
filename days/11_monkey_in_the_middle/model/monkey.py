@@ -22,21 +22,35 @@ class Monkey:
         self.if_test_true_throw_to_monkey_with_id = if_test_true_throw_to_monkey_with_id
         self.if_test_false_throw_to_monkey_with_id = if_test_false_throw_to_monkey_with_id
 
-    def inspect_items_and_throw_to_other_monkeys(self, monkeys: list['Monkey'], worry_level_divisor_rules: int):
+    def inspect_items_and_throw_to_other_monkeys_simple(self, monkeys: list['Monkey'], worry_level_divisor_rules: int):
         while self.items != []:
             item = self.items.pop(0)
             item.add_operation(self.operation)
             worry_level = item.apply_all_operations_and_get_value()
-            if worry_level_divisor_rules > 1:
-                worry_level_bored = int(worry_level / worry_level_divisor_rules)
-                item.add_operation(DivideBy(worry_level_divisor_rules))
-            else:
-                worry_level_bored = worry_level
+
+            worry_level_bored = int(worry_level / worry_level_divisor_rules)
+            item.add_operation(DivideBy(worry_level_divisor_rules))
+
             if worry_level_bored % self.test_divisor == 0:
                 self.throw_to_monkey(item, self.if_test_true_throw_to_monkey_with_id, monkeys)
             else:
                 self.throw_to_monkey(item, self.if_test_false_throw_to_monkey_with_id, monkeys)
             self.count_of_items_inspected += 1
+
+    def inspect_items_and_throw_to_other_monkeys_optimized(self, monkeys: list['Monkey'], worry_level_divisor_rules: int):
+        if worry_level_divisor_rules > 1:
+            return self.inspect_items_and_throw_to_other_monkeys_simple(monkeys, worry_level_divisor_rules)
+        if worry_level_divisor_rules == 1:
+            while self.items != []:
+                item = self.items.pop(0)
+                item.add_operation(self.operation)
+                if item.is_divisible_by(self.test_divisor):
+                    self.throw_to_monkey(item, self.if_test_true_throw_to_monkey_with_id, monkeys)
+                else:
+                    self.throw_to_monkey(item, self.if_test_false_throw_to_monkey_with_id, monkeys)
+                self.count_of_items_inspected += 1
+        else:
+            raise Exception(f"No optimization for factor {worry_level_divisor_rules}")
 
     def throw_to_monkey(self, item: Item, target_monkey_id: int, monkeys: list['Monkey']):
         target_list = list(filter(lambda monkey: monkey.id == target_monkey_id, monkeys))
