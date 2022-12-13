@@ -16,7 +16,7 @@ class Solution:
         #monkey_interaction_short.perform_rounds(20)
         # task 2
         monkey_interaction_long = MonkeyInteractionLong(copy.deepcopy(self.monkeys))
-        monkey_interaction_long.perform_rounds(4000)
+        monkey_interaction_long.perform_rounds(10000)
         # return monkey_interaction_short.get_monkey_business(), monkey_interaction_long.get_monkey_business()
         return 1, monkey_interaction_long.get_monkey_business()
 
@@ -29,10 +29,8 @@ def read_input() -> list[Monkey]:
         Monkey(3, [Item(74)], Add(3), 17, 0, 1),
     ]
 
-import sys
+
 if __name__ == '__main__':
-    print(sys.getrecursionlimit())
-    sys.setrecursionlimit(10000)
     input_lines = read_input()
     solution = Solution(input_lines)
     print(f"Answer : {solution.solve()}")
