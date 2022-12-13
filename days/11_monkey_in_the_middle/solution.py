@@ -12,13 +12,13 @@ class Solution:
 
     def solve(self) -> (int, int):
         # task 1
-        #monkey_interaction_short = MonkeyInteraction(copy.deepcopy(self.monkeys))
-        #monkey_interaction_short.perform_rounds(20)
+        monkey_interaction_short = MonkeyInteraction(copy.deepcopy(self.monkeys))
+        monkey_interaction_short.perform_rounds(20)
         # task 2
-        monkey_interaction_long = MonkeyInteractionLong(copy.deepcopy(self.monkeys))
-        monkey_interaction_long.perform_rounds(20)
+        #monkey_interaction_long = MonkeyInteractionLong(copy.deepcopy(self.monkeys))
+        #monkey_interaction_long.perform_rounds(20)
         # return monkey_interaction_short.get_monkey_business(), monkey_interaction_long.get_monkey_business()
-        return 1, monkey_interaction_long.get_monkey_business()
+        return 1, monkey_interaction_short.get_monkey_business()
 
 
 def read_input() -> list[Monkey]:

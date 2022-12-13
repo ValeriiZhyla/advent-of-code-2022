@@ -27,3 +27,13 @@ class MultiplyBy(Operation):
 class Square(Operation):
     def apply(self, x: int) -> int:
         return x * x
+
+
+class DivideBy(Operation):
+    value: int = 0
+
+    def __init__(self, factor: int):
+        self.value = factor
+
+    def apply(self, x: int) -> int:
+        return int(x / self.value)

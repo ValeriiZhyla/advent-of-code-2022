@@ -1,6 +1,6 @@
 from typing import Callable
 from .item import Item
-from .operation import Operation
+from .operation import Operation, DivideBy
 
 class Monkey:
     id: int = 0
@@ -29,6 +29,7 @@ class Monkey:
             worry_level = item.apply_all_operations_and_get_value()
             if worry_level_divisor_rules > 1:
                 worry_level_bored = int(worry_level / worry_level_divisor_rules)
+                item.add_operation(DivideBy(worry_level_divisor_rules))
             else:
                 worry_level_bored = worry_level
             if worry_level_bored % self.test_divisor == 0:

@@ -7,6 +7,7 @@ class Item:
 
     def __init__(self, worry_level: int):
         self.original_worry_level = worry_level
+        self.applied_operations = []
 
     def add_operation(self, operation: Operation):
         self.applied_operations.append(operation)

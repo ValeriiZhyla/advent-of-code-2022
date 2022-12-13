@@ -30,7 +30,7 @@ class MonkeyInteraction:
     def print_round_results(self, round_id):
         print(f"After round {round_id + 1}, the monkeys are holding items with these worry levels:")
         for monkey in self.monkeys:
-            print(f"Monkey {monkey.id}: {str(monkey.items)}")
+            print(f"Monkey {monkey.id}: {list(map(lambda item: item.apply_all_operations_and_get_value(), monkey.items))}")
         print()
 
 class MonkeyInteractionLong(MonkeyInteraction):
