@@ -38,9 +38,10 @@ class MonkeyInteractionLong(MonkeyInteraction):
             monkey.inspect_items_and_throw_to_other_monkeys_optimized(self.monkeys, self.WORRY_LEVEL_DIVISOR_AFTER_OPERATION_LONG)
 
     def print_round_results(self, round_id):
-        print(f"== After round {round_id + 1} ==")
-        for monkey in self.monkeys:
-            # print(f"Monkey {monkey.id} inspected items {str(monkey.count_of_items_inspected)}")
-            print(f"Monkey {monkey.id} inspected items {str(monkey.count_of_items_inspected)}, items: {str(monkey.items)}")
+        if (round_id + 1) % 100 == 0:
+            print(f"== After round {round_id + 1} ==")
+            for monkey in self.monkeys:
+                # print(f"Monkey {monkey.id} inspected items {str(monkey.count_of_items_inspected)}")
+                print(f"Monkey {monkey.id} inspected items {str(monkey.count_of_items_inspected)}, items: {str(monkey.items)}")
 
-        print()
+            print()
