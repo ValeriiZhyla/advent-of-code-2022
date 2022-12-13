@@ -1,6 +1,8 @@
 from .monkey import Monkey
 
 
+
+
 class MonkeyInteraction:
     monkeys: list[Monkey] = []
 
@@ -31,7 +33,6 @@ class MonkeyInteraction:
             print(f"Monkey {monkey.id}: {str(monkey.items)}")
         print()
 
-
 class MonkeyInteractionLong(MonkeyInteraction):
     def perform_one_round(self):
         for monkey in self.monkeys:
@@ -40,5 +41,8 @@ class MonkeyInteractionLong(MonkeyInteraction):
     def print_round_results(self, round_id):
         print(f"== After round {round_id + 1} ==")
         for monkey in self.monkeys:
-            print(f"Monkey {monkey.id} inspected items {str(monkey.count_of_items_inspected)}")
+            #print(f"Monkey {monkey.id} inspected items {str(monkey.count_of_items_inspected)}")
+            print(f"Monkey {monkey.id} inspected items {str(monkey.count_of_items_inspected)}, items: {str(monkey.items)}")
+
+
         print()
