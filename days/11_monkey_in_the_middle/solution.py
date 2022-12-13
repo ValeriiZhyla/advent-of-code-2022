@@ -29,8 +29,10 @@ def read_input() -> list[Monkey]:
         Monkey(3, [Item(74)], Add(3), 17, 0, 1),
     ]
 
-
+import sys
 if __name__ == '__main__':
+    print(sys.getrecursionlimit())
+    sys.setrecursionlimit(10000)
     input_lines = read_input()
     solution = Solution(input_lines)
     print(f"Answer : {solution.solve()}")

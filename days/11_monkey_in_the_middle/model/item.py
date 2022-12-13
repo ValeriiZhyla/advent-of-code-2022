@@ -20,17 +20,22 @@ class Item:
 
     def is_divisible_by(self, test_divisor: int) -> bool:
         assert self.original_worry_level != 0
-        current_value = self.original_worry_level
-        if current_value % test_divisor == 0:
-            return True
+        return self.calculate_modulo_residuum(self.original_worry_level, self.applied_operations, test_divisor) == 0
+
+    def calculate_modulo_residuum(self, original: int, operations: list[Operation], modulus: int) -> int:
+        if operations == []:
+            return original % modulus
         else:
-            for operation in reversed(self.applied_operations):
-                if isinstance(operation, Square):
-                    continue
-                elif isinstance(operation, MultiplyBy):
-                    factor = operation.value
-                    if factor % test_divisor == 0:
-                        return True
-                elif isinstance(operation, Add):
-                    return self.apply_all_operations_and_get_value() % test_divisor == 0
-        return self.apply_all_operations_and_get_value() % test_divisor == 0
+            operation = operations[-1]
+            if isinstance(operation, Square):
+                a = self.calculate_modulo_residuum(original, operations[:-1], modulus)
+                return (a * a) % modulus
+            elif isinstance(operation, MultiplyBy):
+                factor = operation.value
+                if factor % modulus == 0:
+                    return 0
+                else:
+                    return (self.calculate_modulo_residuum(original, operations[:-1], modulus) * (factor % modulus)) % modulus
+            elif isinstance(operation, Add):
+                summand = operation.value
+                return (self.calculate_modulo_residuum(original, operations[:-1], modulus) + summand % modulus) % modulus
