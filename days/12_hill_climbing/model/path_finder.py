@@ -1,17 +1,12 @@
 from .path import Path
 from .coordinate import Coordinate
 
-from copy import deepcopy
+from copy import deepcopy, copy
 
 
 class PathFinder:
     all_valid_unique_paths_from_S_to_E: list[Path] = []
-    grid_description: list[str]
-
-    min_width = 0
-    min_height = 0
-    max_width = 0
-    max_height = 0
+    grid_description: list[str] = []
 
     start_point_position = None
     end_point_position = None
@@ -21,14 +16,13 @@ class PathFinder:
     START_POINT_ELEVATION: str = "a"
     END_POINT_ELEVATION: str = "z"
 
+    known_paths: dict[(int, int), list[Path]] = {}
+
     def __init__(self, lines: list[str]):
         self.all_valid_unique_paths_from_S_to_E = []
         self.grid_description = lines
         assert self.grid_description != []
-        self.min_width = 0
-        self.min_height = 0
-        self.max_width = len(lines[0]) - 1
-        self.max_height = len(lines) - 1
+
         for y in range(0, len(lines)):
             row = lines[y]
             for x in range(0, len(row)):
@@ -37,23 +31,20 @@ class PathFinder:
                 if row[x] == self.START_POINT_NAME:
                     self.start_point_position = Coordinate(x, y)
 
-    def calculate_shortest_path_length_from_start_to_end(self) -> int:
-        starting_point = self.start_point_position
-        path = Path()
-        path.add_point(starting_point)
-        all_unique_paths_from_start_point = self.calculate_all_possible_unique_paths(starting_point, path)
-        all_paths_with_end_point = self.find_paths_with_end_point(all_unique_paths_from_start_point)
-        return self.find_minimal_steps_until_end_point(all_paths_with_end_point)
+
 
     def calculate_all_possible_unique_paths(self, point: Coordinate, current_path: Path) -> list[Path]:
-        if self.is_end_point(point):
-           return [current_path]
-        print(f"Calculating paths from ({point.x},{point.y})...")
+        #if self.is_end_point(point):
+        #    return [current_path]
+        # print(f"Calculating paths from ({point.x},{point.y})...")
         paths_from_right = []
         paths_from_left = []
         paths_from_top = []
         paths_from_bottom = []
-        # TODO ADD more memoisation
+
+        if self.point_is_already_traversed(point):
+            return self.cached_paths(point)
+
         if point.x < self.max_width:
             right_point = Coordinate(point.x + 1, point.y)
             if not current_path.point_is_already_visited(right_point):
@@ -83,10 +74,10 @@ class PathFinder:
                     path.add_point(bottom_point)
                     paths_from_bottom = self.calculate_all_possible_unique_paths(bottom_point, path)
         all_paths = paths_from_right + paths_from_left + paths_from_top + paths_from_bottom
-        all_paths_with_end_point = self.find_paths_with_end_point(all_paths)
-        if all_paths_with_end_point == []:
+        self.save_paths_in_cache(point, all_paths)
+        if all_paths == []:
             return [current_path]
-        return all_paths_with_end_point
+        return all_paths
 
     def is_end_point(self, point: Coordinate):
         return self.grid_description[point.y][point.x] == self.END_POINT_NAME
@@ -114,5 +105,20 @@ class PathFinder:
     def find_minimal_steps_until_end_point(self, all_paths_with_end_point):
         return min(map(lambda path: path.steps_till_point(self.end_point_position), all_paths_with_end_point))
 
+    def point_is_already_traversed(self, point: Coordinate) -> bool:
+        if (point.x, point.y) in self.known_paths.keys():
+            return self.known_paths[point.x, point.y] != []
+        return False
 
+    def cached_paths(self, point) -> list[Path]:
+        return self.known_paths[point.x, point.y]
+
+    def save_paths_in_cache(self, point, paths: list[Path]):
+        if (point.x, point.y) in self.known_paths.keys():
+            current_cache = self.known_paths[point.x, point.y]
+            new_cache = current_cache + deepcopy(paths)
+            self.known_paths[point.x, point.y] = new_cache
+        else:
+            new_cache = deepcopy(paths)
+            self.known_paths[point.x, point.y] = new_cache
 

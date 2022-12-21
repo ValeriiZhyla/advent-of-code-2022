@@ -1,4 +1,6 @@
 from model.path_finder import PathFinder
+from model.paths_graph import PathsGraph
+from model.paths_graph_parser import PathsGraphParser
 
 class Solution:
     input = []
@@ -7,7 +9,8 @@ class Solution:
         self.input = input
 
     def solve(self) -> int:
-        return PathFinder(self.input).calculate_shortest_path_length_from_start_to_end()
+        available_paths: PathsGraph = PathsGraphParser().build_graph(self.input)
+        return available_paths
 
 
 def read_input() -> list[str]:
