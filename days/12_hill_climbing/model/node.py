@@ -9,8 +9,11 @@ class Node:
     name: str = ""
     elevation: str = ""
     neighbours: set['Node'] = set()
+    x_coordinate: int = 0
+    y_coordinate: int = 0
+    depth = 0
 
-    def __init__(self, name):
+    def __init__(self, name, x, y):
         self.name = name
         self.neighbours = set()
         if name == START_POINT_NAME:
@@ -19,6 +22,8 @@ class Node:
             self.elevation = END_POINT_ELEVATION
         else:
             self.elevation = name
+        self.x_coordinate = x
+        self.y_coordinate = y
 
     def add_neighbour(self, neighbour: 'Node'):
         self.neighbours.add(neighbour)
@@ -31,5 +36,5 @@ class Node:
         if self.name == END_POINT_NAME:
             return True
 
-    def is_accessible_from(self, node: 'Node') -> bool:
-        return abs(ord(self.elevation) - ord(node.elevation)) <= 1
+    def target_node_is_accessible(self, target: 'Node') -> bool:
+        return ord(target.elevation) - ord(self.elevation) <= 1

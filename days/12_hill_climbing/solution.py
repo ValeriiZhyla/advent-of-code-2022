@@ -9,12 +9,13 @@ class Solution:
         self.input = input
 
     def solve(self) -> int:
-        available_paths: PathsGraph = PathsGraphParser().build_graph(self.input)
-        return available_paths
+        graph: PathsGraph = PathsGraphParser().build_graph(self.input)
+        minimal_distance = PathFinder().find_length_of_shortest_path_from_start_to_end(graph)
+        return minimal_distance
 
 
 def read_input() -> list[str]:
-    input_file_name = 'small_input.txt'
+    input_file_name = 'input.txt'
     try:
         with open(input_file_name) as file:
             input_lines = file.readlines()
