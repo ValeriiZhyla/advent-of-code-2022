@@ -1,5 +1,6 @@
 from model.pair import PacketPair
 from model.signal_parser import SignalParser
+from model.signal_analyzer import SignalAnalyzer
 
 class Solution:
     input = []
@@ -8,12 +9,14 @@ class Solution:
         self.input = input
 
     def solve(self):
+        # Task 1
         pairs: list[PacketPair] = SignalParser().parse_signal(self.input)
-        print(pairs)
+        filtered_pairs: list[PacketPair] = SignalAnalyzer().filter_pairs_with_right_order(pairs)
+        return sum(map(lambda pair: pair.index, filtered_pairs))
 
 
 def read_input() -> list[str]:
-    input_file_name = 'small_input.txt'
+    input_file_name = 'input.txt'
     try:
         with open(input_file_name) as file:
             input_lines = file.readlines()
@@ -30,4 +33,5 @@ if __name__ == '__main__':
     print(input_lines)
     solution = Solution(input_lines)
     print(f"Answer : {solution.solve()}")
+    # 5557
 
