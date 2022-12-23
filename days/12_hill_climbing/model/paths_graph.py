@@ -16,3 +16,7 @@ class PathsGraph:
         for node in self.nodes:
             if node.is_end_node():
                 return node
+
+    def erase_current_depth_in_nodes(self):
+        for node in self.nodes:
+            node.depth = 0

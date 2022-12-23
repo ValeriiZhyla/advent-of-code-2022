@@ -38,3 +38,6 @@ class Node:
 
     def target_node_is_accessible(self, target: 'Node') -> bool:
         return ord(target.elevation) - ord(self.elevation) <= 1
+
+    def has_same_elevation_as_starting_point(self):
+        return self.elevation == START_POINT_ELEVATION
