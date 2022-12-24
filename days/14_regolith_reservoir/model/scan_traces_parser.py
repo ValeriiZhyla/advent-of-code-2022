@@ -1,12 +1,12 @@
 from .point import Point
-from .cave_structure import CaveStructure
+from .cave import Cave
 
 class ScanTracesParser:
     ENTRY_SPLIT = " -> "
     COORDINATE_SPLIT = ","
 
-    def parse_cave_rock_structure(self, input: list[str]) -> CaveStructure:
-        cave = CaveStructure()
+    def parse_cave_rock_structure(self, input: list[str]) -> Cave:
+        cave = Cave()
         for line in input:
             points: list[Point] = self.get_all_points(line)
             for idx in range(0, len(points) - 1):
