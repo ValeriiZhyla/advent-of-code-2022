@@ -2,7 +2,7 @@ from .point import Point
 
 class Cave:
     rock_coordinates: set[Point] = set()
-    sand_sources_coordinates: set[Point] = set()
+    sand_source: Point = None
     sand_in_rest_state_coordinates: set[Point] = set()
 
     ROCK_SYMBOL = "#"
@@ -10,11 +10,15 @@ class Cave:
     SAND_SYMBOL = "o"
     AIR_SYMBOL = "."
 
+    LEFTMOST_FLOOR_X = -1000
+    RIGHTMOST_FLOOR_X = 3000
+
     def __init__(self):
         self.last_simulation_terminated = True
         self.rock_coordinates = set()
-        self.sand_sources_coordinates = set()
+        self.sand_source = None
         self.sand_in_rest_state_coordinates = set()
+
 
     def add_rock_path_between(self, path_start: Point, path_end: Point):
         if path_start.x == path_end.x:
@@ -38,7 +42,7 @@ class Cave:
             for x in range(min_x, max_x + 1):
                 if Point(x, y) in self.rock_coordinates:
                     print(self.ROCK_SYMBOL, end="")
-                elif Point(x, y) in self.sand_sources_coordinates:
+                elif Point(x, y) == self.sand_source and self.sand_source not in self.sand_in_rest_state_coordinates:
                     print(self.SAND_SOURCE_SYMBOL, end="")
                 elif Point(x, y) in self.sand_in_rest_state_coordinates:
                     print(self.SAND_SYMBOL, end="")
@@ -48,10 +52,15 @@ class Cave:
         print("=====================================")
 
     def add_sand_source(self, sand_source: Point):
-        self.sand_sources_coordinates.add(sand_source)
+        self.sand_source = sand_source
 
-    def all_filled_coordinates(self) -> set[Point]:
-        return self.rock_coordinates.union(self.sand_sources_coordinates.union(self.sand_in_rest_state_coordinates))
+    def point_is_in_all_filled_coordinates(self, point: Point) -> bool:
+        return point == self.sand_source or point in self.rock_coordinates or point in self.sand_in_rest_state_coordinates
+
+    def all_filled_coordinates(self):
+        all = self.rock_coordinates.union(self.sand_in_rest_state_coordinates)
+        all.add(self.sand_source)
+        return all
 
     def amount_of_sand_in_rest_state(self):
         return len(self.sand_in_rest_state_coordinates)
@@ -60,39 +69,46 @@ class Cave:
         """
         :return: True if sand unit stays still at the end. False if it falls into abyss.
         """
-        simulation_results = []
-        for sand_source in self.sand_sources_coordinates:
-            if self.has_air_beneath(sand_source):
-                new_sand_unit = Point(sand_source.x, sand_source.y + 1)
-                simulation_results.append(self.simulate_sand_unit(new_sand_unit))
-            else:
-                simulation_results.append(False)
-        return all(simulation_results)
+        new_sand_unit = Point(self.sand_source.x, self.sand_source.y)
+        return self.simulate_sand_unit(new_sand_unit)
 
     def simulate_sand_unit(self, sand_unit: Point) -> bool:
         """
-        :return: True if simulation terminated. False if sand unit falls into abyss.
+        :return: True if simulation terminated. False if sand unit falls into abyss or blocks the source.
         """
         abyss_level_y = max(map(lambda point: point.y, self.all_filled_coordinates())) + 1
         current_sand_coordinate: Point = sand_unit
         while current_sand_coordinate.y < abyss_level_y:
-            #self.print()
             if self.has_air_beneath(current_sand_coordinate):
                 current_sand_coordinate = Point(current_sand_coordinate.x, current_sand_coordinate.y + 1)
             elif self.has_air_beneath_left(current_sand_coordinate):
                 current_sand_coordinate = Point(current_sand_coordinate.x - 1, current_sand_coordinate.y + 1)
             elif self.has_air_beneath_right(current_sand_coordinate):
                 current_sand_coordinate = Point(current_sand_coordinate.x + 1, current_sand_coordinate.y + 1)
+            elif current_sand_coordinate == self.sand_source and not self.move_is_possible(current_sand_coordinate):
+                self.sand_in_rest_state_coordinates.add(current_sand_coordinate)
+                #self.print()
+                return False
             else:
                 self.sand_in_rest_state_coordinates.add(current_sand_coordinate)
+                #self.print()
                 return True
         return False
 
     def has_air_beneath(self, original_point: Point) -> bool:
-        return Point(original_point.x, original_point.y + 1) not in self.all_filled_coordinates()
+        return not self.point_is_in_all_filled_coordinates(Point(original_point.x, original_point.y + 1))
 
     def has_air_beneath_right(self, original_point: Point) -> bool:
-        return Point(original_point.x + 1, original_point.y + 1) not in self.all_filled_coordinates()
+        return not self.point_is_in_all_filled_coordinates(Point(original_point.x + 1, original_point.y + 1))
 
     def has_air_beneath_left(self, original_point: Point) -> bool:
-        return Point(original_point.x - 1, original_point.y + 1) not in self.all_filled_coordinates()
+        return not self.point_is_in_all_filled_coordinates(Point(original_point.x - 1, original_point.y + 1))
+
+    def add_floor(self):
+        floor_level_y = max(map(lambda point: point.y, self.all_filled_coordinates())) + 2
+        self.add_rock_path_between(Point(self.LEFTMOST_FLOOR_X, floor_level_y), Point(self.RIGHTMOST_FLOOR_X, floor_level_y))
+
+    def move_is_possible(self, current_sand_coordinate):
+        return self.has_air_beneath(current_sand_coordinate) or self.has_air_beneath_left(current_sand_coordinate) or self.has_air_beneath_right(current_sand_coordinate)
+
+
