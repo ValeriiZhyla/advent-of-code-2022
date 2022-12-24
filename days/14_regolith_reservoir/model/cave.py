@@ -11,9 +11,6 @@ class Cave:
     SAND_SYMBOL = "o"
     AIR_SYMBOL = "."
 
-    LEFTMOST_FLOOR_X = -1000
-    RIGHTMOST_FLOOR_X = 3000
-
     def __init__(self):
         self.last_simulation_terminated = True
         self.rock_coordinates = set()
@@ -106,7 +103,10 @@ class Cave:
 
     def add_floor(self):
         floor_level_y = max(map(lambda point: point.y, self.all_filled_coordinates())) + 2
-        self.add_rock_path_between(Point(self.LEFTMOST_FLOOR_X, floor_level_y), Point(self.RIGHTMOST_FLOOR_X, floor_level_y))
+        min_x, max_x = min(map(lambda point: point.x, self.all_filled_coordinates())), max(map(lambda point: point.x, self.all_filled_coordinates()))
+        min_y, max_y = min(map(lambda point: point.y, self.all_filled_coordinates())), max(map(lambda point: point.y, self.all_filled_coordinates()))
+        delta_y = max_y - min_y
+        self.add_rock_path_between(Point(self.sand_source.x - 2 * delta_y,  floor_level_y), Point(self.sand_source.x + 2 * delta_y, floor_level_y))
 
     def move_is_possible(self, current_sand_coordinate):
         return self.has_air_beneath(current_sand_coordinate) or self.has_air_beneath_left(current_sand_coordinate) or self.has_air_beneath_right(current_sand_coordinate)
