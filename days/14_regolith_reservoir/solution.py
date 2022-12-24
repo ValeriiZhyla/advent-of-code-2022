@@ -3,9 +3,10 @@ from model.cave_simulation import CaveSimulation
 from model.scan_traces_parser import ScanTracesParser
 from model.point import Point
 
+
 class Solution:
     input = []
-    DEFAULT_SAND_SOURCE_POSITION = Point(500,0)
+    DEFAULT_SAND_SOURCE_POSITION = Point(500, 0)
 
     def __init__(self, input):
         self.input = input
@@ -24,7 +25,6 @@ class Solution:
         cave_simulation = CaveSimulation(cave_structure)
         sand_units_floor = cave_simulation.perform_simulation()
         return sand_units_abyss, sand_units_floor
-
 
 
 def read_input() -> list[str]:
@@ -46,4 +46,3 @@ if __name__ == '__main__':
     solution = Solution(input_lines)
     print(f"Answer : {solution.solve()}")
     # 592, 30367
-

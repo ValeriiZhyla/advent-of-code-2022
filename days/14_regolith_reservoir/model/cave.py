@@ -1,5 +1,6 @@
 from .point import Point
 
+
 class Cave:
     rock_coordinates: set[Point] = set()
     sand_source: Point = None
@@ -18,7 +19,6 @@ class Cave:
         self.rock_coordinates = set()
         self.sand_source = None
         self.sand_in_rest_state_coordinates = set()
-
 
     def add_rock_path_between(self, path_start: Point, path_end: Point):
         if path_start.x == path_end.x:
@@ -87,11 +87,11 @@ class Cave:
                 current_sand_coordinate = Point(current_sand_coordinate.x + 1, current_sand_coordinate.y + 1)
             elif current_sand_coordinate == self.sand_source and not self.move_is_possible(current_sand_coordinate):
                 self.sand_in_rest_state_coordinates.add(current_sand_coordinate)
-                #self.print()
+                # self.print()
                 return False
             else:
                 self.sand_in_rest_state_coordinates.add(current_sand_coordinate)
-                #self.print()
+                # self.print()
                 return True
         return False
 
@@ -110,5 +110,3 @@ class Cave:
 
     def move_is_possible(self, current_sand_coordinate):
         return self.has_air_beneath(current_sand_coordinate) or self.has_air_beneath_left(current_sand_coordinate) or self.has_air_beneath_right(current_sand_coordinate)
-
-
