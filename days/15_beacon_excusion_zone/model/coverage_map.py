@@ -1,5 +1,6 @@
 from .sensor import Sensor
 from .point import Point
+from .range import Range
 
 import itertools
 
@@ -36,12 +37,14 @@ class CoverageMap:
             print()
 
     def print_map_with_coverage(self):
-        coverage = self.calculate_coverage_full()
-        min_x = min(map(lambda point: point.x, coverage))
-        max_x = max(map(lambda point: point.x, coverage))
-        min_y = min(map(lambda point: point.y, coverage))
-        max_y = max(map(lambda point: point.y, coverage))
+        coverage: set[Range] = self.calculate_coverage_full()
+        min_x = min(map(lambda range: range.start, coverage))
+        max_x = max(map(lambda range: range.end, coverage))
+        min_y = min(map(lambda range: range.row_number, coverage))
+        max_y = max(map(lambda range: range.row_number, coverage))
         for y in range(min_y, max_y + 1):
+            coverage_ranges_for_current_row: list[Range] = list(filter(lambda range: range.row_number == y, coverage))
+
             if y < 0:
                 print(y, " ", end="")
             elif y < 10:
@@ -54,7 +57,7 @@ class CoverageMap:
                     print(self.SENSOR_SYMBOL, end="")
                 elif point in self.beacon_positions:
                     print(self.BEACON_SYMBOL, end="")
-                elif point in coverage and point not in self.sensor_positions and point not in self.beacon_positions:
+                elif self.row_coverage_contains_x(point.x, coverage_ranges_for_current_row) and point not in self.sensor_positions and point not in self.beacon_positions:
                     print(self.COVERAGE_SYMBOL, end="")
                 else:
                     print(self.FREE_SYMBOL, end="")
@@ -62,10 +65,10 @@ class CoverageMap:
 
     def print_map_with_coverage_line(self, row):
         coverage = self.calculate_coverage_for_one_row(row)
-        min_x = min(map(lambda point: point.x, coverage))
-        max_x = max(map(lambda point: point.x, coverage))
-        min_y = min(map(lambda point: point.y, coverage))
-        max_y = max(map(lambda point: point.y, coverage))
+        min_x = min(map(lambda range: range.start, coverage))
+        max_x = max(map(lambda range: range.end, coverage))
+        min_y = min(map(lambda range: range.row_number, coverage))
+        max_y = max(map(lambda range: range.row_number, coverage))
         for y in range(min_y, max_y + 1):
             if y < 0:
                 print(y, " ", end="")
@@ -85,36 +88,41 @@ class CoverageMap:
                     print(self.FREE_SYMBOL, end="")
             print()
 
-    def calculate_coverage_full(self) -> set[Point]:
-        coverage: set[Point] = set()
+    def calculate_coverage_full(self) -> set[Range]:
+        coverage: set[Range] = set()
         i = 0
         for sensor in self.sensors:
-            possible_x = [x for x in range(sensor.sensor_coordinate.x - sensor.manhattan_distance, sensor.sensor_coordinate.x + sensor.manhattan_distance)]
-            possible_y = [y for y in range(sensor.sensor_coordinate.y - sensor.manhattan_distance, sensor.sensor_coordinate.y + sensor.manhattan_distance)]
-
-            sensor_coverage_square = set([Point(x, y) for (x, y) in itertools.product(possible_x, possible_y)])
-            sensor_coverage_circle = set(filter(lambda point: point.calculate_manhattan_distance_to(sensor.sensor_coordinate) <= sensor.manhattan_distance , sensor_coverage_square))
-            coverage = coverage.union(sensor_coverage_circle)
+            possible_rows = [y for y in range(sensor.sensor_coordinate.y - sensor.manhattan_distance, sensor.sensor_coordinate.y + sensor.manhattan_distance)]
+            for y in possible_rows:
+                range_for_current_row = self.create_coverage_range_for_sensor_and_row(sensor, y)
+                coverage.add(range_for_current_row)
             i += 1
             print(f"Sensor {i} out {len(self.sensors)} processed")
         return coverage
 
-
-
-    def calculate_coverage_for_one_row(self, row: int) -> set[Point]:
-        coverage: set[Point] = set()
+    def calculate_coverage_for_one_row(self, row: int) -> set[Range]:
+        coverage: set[Range] = set()
         sensors_to_check = list(filter(lambda sensor: row in range(sensor.sensor_coordinate.y - sensor.manhattan_distance, sensor.sensor_coordinate.y + sensor.manhattan_distance + 1) ,self.sensors))
         i = 0
         for sensor in sensors_to_check:
-            sensor_line = set([Point(x, row) for x in range(sensor.sensor_coordinate.x - sensor.manhattan_distance, sensor.sensor_coordinate.x + sensor.manhattan_distance + 1)])
-            sensor_line_coverage = set(filter(lambda point: point.calculate_manhattan_distance_to(sensor.sensor_coordinate) <= sensor.manhattan_distance , sensor_line))
-            coverage = coverage.union(sensor_line_coverage)
+            range_for_current_row = self.create_coverage_range_for_sensor_and_row(sensor, row)
+            coverage.add(range_for_current_row)
             i += 1
             print(f"Sensor {i} out {len(sensors_to_check)} processed")
         return coverage
 
     def amount_of_positions_where_a_beacon_cannot_be_present_in_row(self, row: int) -> int:
-        return len(self.calculate_coverage_for_one_row(row)) - len(list(filter(lambda beacon: beacon.y == row, self.beacon_positions)))
+        coverage_ranges_of_row = self.calculate_coverage_for_one_row(row)
+        all_covered_x = set()
+        for range in coverage_ranges_of_row:
+            all_covered_x = all_covered_x.union(range.get_all_x_in_range())
+        return len(all_covered_x) - len(list(filter(lambda beacon: beacon.y == row, self.beacon_positions)))
+
+    def create_coverage_range_for_sensor_and_row(self, sensor: Sensor, row_number: int) -> Range:
+        row_range_start = sensor.sensor_coordinate.x - (sensor.manhattan_distance - abs(sensor.sensor_coordinate.y - row_number))
+        row_range_end = sensor.sensor_coordinate.x + (sensor.manhattan_distance - abs(sensor.sensor_coordinate.y - row_number))
+        range_for_current_row = Range(row_number, row_range_start, row_range_end)
+        return range_for_current_row
 
     def calculate_tuning_frequency_of_distress_beacon(self, coordinates_upper_bound):
         covered_positions: set[Point] = self.calculate_coverage_full()
@@ -127,3 +135,9 @@ class CoverageMap:
                 if Point(x, y) not in covered_positions and 0 <= x <= coordinates_upper_bound and 0 <= y <= coordinates_upper_bound:
                     return x * 4000000 + y
         raise Exception("Beacon not found")
+
+    def row_coverage_contains_x(self, x: int, coverage_ranges_for_current_row: list[Range]) -> bool:
+        for range in coverage_ranges_for_current_row:
+            if range.contains_x(x):
+                return True
+        return False
