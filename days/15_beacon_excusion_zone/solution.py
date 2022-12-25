@@ -16,12 +16,15 @@ class Solution:
         # Task 1
         sensors: list[Sensor] = SensorReportParser().parse(self.input)
         beacon_coverage_map: CoverageMap = CoverageMap(sensors)
-        sample_covered_positions = beacon_coverage_map.amount_of_positions_where_a_beacon_cannot_be_present_in_row(2000000)
-        return sample_covered_positions
+        # sample_covered_positions = beacon_coverage_map.amount_of_positions_where_a_beacon_cannot_be_present_in_row(2000000)
+        sample_covered_positions = 1
+        # Task 2
+        tuning_frequency_of_beacon = beacon_coverage_map.calculate_tuning_frequency_of_distress_beacon(20)
+        return sample_covered_positions, tuning_frequency_of_beacon
 
 
 def read_input() -> list[str]:
-    input_file_name = FULL_INPUT
+    input_file_name = TEST_INPUT
     try:
         with open(input_file_name) as file:
             input_lines = file.readlines()
