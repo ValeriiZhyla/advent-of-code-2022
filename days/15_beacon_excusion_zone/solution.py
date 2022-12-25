@@ -16,12 +16,10 @@ class Solution:
         # Task 1
         sensors: list[Sensor] = SensorReportParser().parse(self.input)
         beacon_coverage_map: CoverageMap = CoverageMap(sensors)
-        #beacon_coverage_map.print_map_with_coverage()
         sample_covered_positions = beacon_coverage_map.amount_of_positions_where_a_beacon_cannot_be_present_in_row(2000000)
+        print("Task 1 completed")
         # Task 2
-        #tuning_frequency_of_beacon = beacon_coverage_map.calculate_tuning_frequency_of_distress_beacon(20)
-        # tuning_frequency_of_beacon = beacon_coverage_map.calculate_tuning_frequency_of_distress_beacon(4000000)
-        tuning_frequency_of_beacon = 1
+        tuning_frequency_of_beacon = beacon_coverage_map.calculate_tuning_frequency_of_distress_beacon(4000000)
         return sample_covered_positions, tuning_frequency_of_beacon
 
 
@@ -43,4 +41,4 @@ if __name__ == '__main__':
     print(input_lines)
     solution = Solution(input_lines)
     print(f"Answer : {solution.solve()}")
-    # 4748135
+    # 4748135, 13743542639657

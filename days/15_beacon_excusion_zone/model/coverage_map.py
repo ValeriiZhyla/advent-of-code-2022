@@ -100,9 +100,26 @@ class CoverageMap:
             print(f"Sensor {i} out {len(self.sensors)} processed")
         return coverage
 
+    def calculate_coverage_full_with_bounds(self, lower_bound_x, upper_bound_x, lower_bound_y, upper_bound_y) -> dict[int, list[Range]]:
+        coverage: dict[int, list[Range]] = {}
+        i = 0
+        sensors_to_check = filter(lambda sensor: lower_bound_x <= sensor.sensor_coordinate.x <= upper_bound_x and lower_bound_y <= sensor.sensor_coordinate.y <= upper_bound_y, self.sensors)
+        for y in range(lower_bound_y, upper_bound_y + 1):
+            coverage[y] = []
+
+        for sensor in sensors_to_check:
+            possible_rows = [y for y in range(sensor.sensor_coordinate.y - sensor.manhattan_distance, sensor.sensor_coordinate.y + sensor.manhattan_distance) if lower_bound_y <= y <= upper_bound_y]
+            for y in possible_rows:
+                range_for_current_row = self.create_coverage_range_for_sensor_and_row(sensor, y)
+                coverage[y].append(range_for_current_row)
+            i += 1
+            print(f"Sensor {i} out {len(self.sensors)} processed")
+        return coverage
+
     def calculate_coverage_for_one_row(self, row: int) -> set[Range]:
         coverage: set[Range] = set()
-        sensors_to_check = list(filter(lambda sensor: row in range(sensor.sensor_coordinate.y - sensor.manhattan_distance, sensor.sensor_coordinate.y + sensor.manhattan_distance + 1) ,self.sensors))
+        sensors_to_check = list(
+            filter(lambda sensor: row in range(sensor.sensor_coordinate.y - sensor.manhattan_distance, sensor.sensor_coordinate.y + sensor.manhattan_distance + 1), self.sensors))
         i = 0
         for sensor in sensors_to_check:
             range_for_current_row = self.create_coverage_range_for_sensor_and_row(sensor, row)
@@ -125,15 +142,16 @@ class CoverageMap:
         return range_for_current_row
 
     def calculate_tuning_frequency_of_distress_beacon(self, coordinates_upper_bound):
-        covered_positions: set[Point] = self.calculate_coverage_full()
-        min_x = min(map(lambda point: point.x, covered_positions))
-        max_x = max(map(lambda point: point.x, covered_positions))
-        min_y = min(map(lambda point: point.y, covered_positions))
-        max_y = max(map(lambda point: point.y, covered_positions))
-        for y in range(min_y, max_y + 1):
-            for x in range(min_x, max_x + 1):
-                if Point(x, y) not in covered_positions and 0 <= x <= coordinates_upper_bound and 0 <= y <= coordinates_upper_bound:
-                    return x * 4000000 + y
+        coverage_ranges: dict[int, list[Range]] = self.calculate_coverage_full_with_bounds(0, coordinates_upper_bound, 0, coordinates_upper_bound)
+        for y in range(0, coordinates_upper_bound + 1):
+            coverage_ranges_for_current_row: list[Range] = coverage_ranges[y]
+            coverage_ranges_for_current_row_without_full_overlap = self.remove_ranges_with_full_overlap(coverage_ranges_for_current_row)
+            if not self.ranges_are_covering_whole_interval(coverage_ranges_for_current_row_without_full_overlap, 0, coordinates_upper_bound):
+                for x in range(0, coordinates_upper_bound + 1):
+                    if not self.row_coverage_contains_x(x, coverage_ranges_for_current_row):
+                        return x * 4000000 + y
+            if y % 10000 == 0:
+                print("Row processed", y, "/", coordinates_upper_bound)
         raise Exception("Beacon not found")
 
     def row_coverage_contains_x(self, x: int, coverage_ranges_for_current_row: list[Range]) -> bool:
@@ -141,3 +159,27 @@ class CoverageMap:
             if range.contains_x(x):
                 return True
         return False
+
+    def ranges_are_covering_whole_interval(self, coverage_ranges_for_current_row, row_start, row_end) -> bool:
+        ordered_ranges = sorted(coverage_ranges_for_current_row)
+        if len(ordered_ranges) == 0:
+            return False
+        if len(ordered_ranges) == 1:
+            return ordered_ranges[0].start <= row_start and ordered_ranges[0].end >= row_end
+        if len(ordered_ranges) >= 1:
+            if ordered_ranges[0].start > row_start:
+                return False
+            if ordered_ranges[len(ordered_ranges) - 1].end < row_end:
+                return False
+            for idx in range(0, len(ordered_ranges) - 1):
+                if ordered_ranges[idx + 1].start - ordered_ranges[idx].end > 1:
+                    return False
+            return True
+
+    def remove_ranges_with_full_overlap(self, coverage_ranges_for_current_row: list[Range]) -> list[Range]:
+        ranges_that_are_fully_overlapped = []
+        for range_to_check in coverage_ranges_for_current_row:
+            for other_range in coverage_ranges_for_current_row:
+                if range_to_check != other_range and other_range.fully_overlaps_other_range(range_to_check):
+                    ranges_that_are_fully_overlapped.append(range_to_check)
+        return [range for range in coverage_ranges_for_current_row if range not in ranges_that_are_fully_overlapped]
