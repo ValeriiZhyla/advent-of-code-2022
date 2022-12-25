@@ -20,74 +20,6 @@ class CoverageMap:
         self.sensor_positions = set(map(lambda sensor: sensor.sensor_coordinate, self.sensors))
         self.beacon_positions = set(map(lambda sensor: sensor.closest_beacon_coordinate, self.sensors))
 
-    def print_map_without_coverage(self):
-        min_x = min(map(lambda sensor: min(sensor.sensor_coordinate.x, sensor.closest_beacon_coordinate.x), self.sensors))
-        max_x = max(map(lambda sensor: max(sensor.sensor_coordinate.x, sensor.closest_beacon_coordinate.x), self.sensors))
-        min_y = min(map(lambda sensor: min(sensor.sensor_coordinate.y, sensor.closest_beacon_coordinate.y), self.sensors))
-        max_y = max(map(lambda sensor: max(sensor.sensor_coordinate.y, sensor.closest_beacon_coordinate.y), self.sensors))
-        for y in range(min_y, max_y + 1):
-            for x in range(min_x, max_x + 1):
-                point = Point(x, y)
-                if point in self.sensor_positions:
-                    print(self.SENSOR_SYMBOL, end="")
-                elif point in self.beacon_positions:
-                    print(self.BEACON_SYMBOL, end="")
-                else:
-                    print(self.FREE_SYMBOL, end="")
-            print()
-
-    def print_map_with_coverage(self):
-        coverage: set[Range] = self.calculate_coverage_full()
-        min_x = min(map(lambda range: range.start, coverage))
-        max_x = max(map(lambda range: range.end, coverage))
-        min_y = min(map(lambda range: range.row_number, coverage))
-        max_y = max(map(lambda range: range.row_number, coverage))
-        for y in range(min_y, max_y + 1):
-            coverage_ranges_for_current_row: list[Range] = list(filter(lambda range: range.row_number == y, coverage))
-
-            if y < 0:
-                print(y, " ", end="")
-            elif y < 10:
-                print("", y, " ", end="")
-            else:
-                print(y, " ", end="")
-            for x in range(min_x, max_x + 1):
-                point = Point(x, y)
-                if point in self.sensor_positions:
-                    print(self.SENSOR_SYMBOL, end="")
-                elif point in self.beacon_positions:
-                    print(self.BEACON_SYMBOL, end="")
-                elif self.row_coverage_contains_x(point.x, coverage_ranges_for_current_row) and point not in self.sensor_positions and point not in self.beacon_positions:
-                    print(self.COVERAGE_SYMBOL, end="")
-                else:
-                    print(self.FREE_SYMBOL, end="")
-            print()
-
-    def print_map_with_coverage_line(self, row):
-        coverage = self.calculate_coverage_for_one_row(row)
-        min_x = min(map(lambda range: range.start, coverage))
-        max_x = max(map(lambda range: range.end, coverage))
-        min_y = min(map(lambda range: range.row_number, coverage))
-        max_y = max(map(lambda range: range.row_number, coverage))
-        for y in range(min_y, max_y + 1):
-            if y < 0:
-                print(y, " ", end="")
-            elif y < 10:
-                print("", y, " ", end="")
-            else:
-                print(y, " ", end="")
-            for x in range(min_x, max_x + 1):
-                point = Point(x, y)
-                if point in self.sensor_positions:
-                    print(self.SENSOR_SYMBOL, end="")
-                elif point in self.beacon_positions:
-                    print(self.BEACON_SYMBOL, end="")
-                elif point in coverage and point not in self.sensor_positions and point not in self.beacon_positions:
-                    print(self.COVERAGE_SYMBOL, end="")
-                else:
-                    print(self.FREE_SYMBOL, end="")
-            print()
-
     def calculate_coverage_full(self) -> set[Range]:
         coverage: set[Range] = set()
         i = 0
@@ -183,3 +115,72 @@ class CoverageMap:
                 if range_to_check != other_range and other_range.fully_overlaps_other_range(range_to_check):
                     ranges_that_are_fully_overlapped.append(range_to_check)
         return [range for range in coverage_ranges_for_current_row if range not in ranges_that_are_fully_overlapped]
+
+    def print_map_with_coverage_line(self, row):
+        coverage = self.calculate_coverage_for_one_row(row)
+        min_x = min(map(lambda range: range.start, coverage))
+        max_x = max(map(lambda range: range.end, coverage))
+        min_y = min(map(lambda range: range.row_number, coverage))
+        max_y = max(map(lambda range: range.row_number, coverage))
+        for y in range(min_y, max_y + 1):
+            if y < 0:
+                print(y, " ", end="")
+            elif y < 10:
+                print("", y, " ", end="")
+            else:
+                print(y, " ", end="")
+            for x in range(min_x, max_x + 1):
+                point = Point(x, y)
+                if point in self.sensor_positions:
+                    print(self.SENSOR_SYMBOL, end="")
+                elif point in self.beacon_positions:
+                    print(self.BEACON_SYMBOL, end="")
+                elif point in coverage and point not in self.sensor_positions and point not in self.beacon_positions:
+                    print(self.COVERAGE_SYMBOL, end="")
+                else:
+                    print(self.FREE_SYMBOL, end="")
+            print()
+
+    def print_map_with_coverage(self):
+        coverage: set[Range] = self.calculate_coverage_full()
+        min_x = min(map(lambda range: range.start, coverage))
+        max_x = max(map(lambda range: range.end, coverage))
+        min_y = min(map(lambda range: range.row_number, coverage))
+        max_y = max(map(lambda range: range.row_number, coverage))
+        for y in range(min_y, max_y + 1):
+            coverage_ranges_for_current_row: list[Range] = list(filter(lambda range: range.row_number == y, coverage))
+
+            if y < 0:
+                print(y, " ", end="")
+            elif y < 10:
+                print("", y, " ", end="")
+            else:
+                print(y, " ", end="")
+            for x in range(min_x, max_x + 1):
+                point = Point(x, y)
+                if point in self.sensor_positions:
+                    print(self.SENSOR_SYMBOL, end="")
+                elif point in self.beacon_positions:
+                    print(self.BEACON_SYMBOL, end="")
+                elif self.row_coverage_contains_x(point.x, coverage_ranges_for_current_row) and point not in self.sensor_positions and point not in self.beacon_positions:
+                    print(self.COVERAGE_SYMBOL, end="")
+                else:
+                    print(self.FREE_SYMBOL, end="")
+            print()
+
+    def print_map_without_coverage(self):
+        min_x = min(map(lambda sensor: min(sensor.sensor_coordinate.x, sensor.closest_beacon_coordinate.x), self.sensors))
+        max_x = max(map(lambda sensor: max(sensor.sensor_coordinate.x, sensor.closest_beacon_coordinate.x), self.sensors))
+        min_y = min(map(lambda sensor: min(sensor.sensor_coordinate.y, sensor.closest_beacon_coordinate.y), self.sensors))
+        max_y = max(map(lambda sensor: max(sensor.sensor_coordinate.y, sensor.closest_beacon_coordinate.y), self.sensors))
+        for y in range(min_y, max_y + 1):
+            for x in range(min_x, max_x + 1):
+                point = Point(x, y)
+                if point in self.sensor_positions:
+                    print(self.SENSOR_SYMBOL, end="")
+                elif point in self.beacon_positions:
+                    print(self.BEACON_SYMBOL, end="")
+                else:
+                    print(self.FREE_SYMBOL, end="")
+            print()
+
