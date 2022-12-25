@@ -1,3 +1,7 @@
+from model.sensor import Sensor
+from model.sensor_report_parser import SensorReportParser
+from model.coverage_map import CoverageMap
+
 FULL_INPUT = "input.txt"
 TEST_INPUT = "small_input.txt"
 
@@ -9,12 +13,15 @@ class Solution:
         self.input = input
 
     def solve(self):
-        pass
+        # Task 1
+        sensors: list[Sensor] = SensorReportParser().parse(self.input)
+        beacon_coverage_map: CoverageMap = CoverageMap(sensors)
+        sample_covered_positions = beacon_coverage_map.amount_of_positions_where_a_beacon_cannot_be_present_in_row(2000000)
+        return sample_covered_positions
 
 
 def read_input() -> list[str]:
-    input_file_name = TEST_INPUT
-    #input_file_name = FULL_INPUT
+    input_file_name = FULL_INPUT
     try:
         with open(input_file_name) as file:
             input_lines = file.readlines()
@@ -31,3 +38,4 @@ if __name__ == '__main__':
     print(input_lines)
     solution = Solution(input_lines)
     print(f"Answer : {solution.solve()}")
+    # 4748135

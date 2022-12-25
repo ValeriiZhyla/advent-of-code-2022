@@ -17,7 +17,6 @@ class Solution:
         cave_structure.add_sand_source(self.DEFAULT_SAND_SOURCE_POSITION)
         cave_simulation = CaveSimulation(cave_structure)
         sand_units_abyss = cave_simulation.perform_simulation()
-        print("First terminated")
         # Task 2
         cave_structure = ScanTracesParser().parse_cave_rock_structure(self.input)
         cave_structure.add_sand_source(self.DEFAULT_SAND_SOURCE_POSITION)
